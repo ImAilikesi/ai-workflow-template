@@ -1,0 +1,10 @@
+.DS_Store
+.lcm/
+.env
+.env.*
+.runtime/gates/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.workflow-recovery/
+.archive/

@@ -1,0 +1,4 @@
+# Retired compatibility marker. Do not run this legacy loop.
+loop: project-builder
+status: retired
+active: false

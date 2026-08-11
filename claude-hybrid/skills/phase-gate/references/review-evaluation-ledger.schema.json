@@ -1,0 +1,112 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://project-template.local/claude-hybrid/review-evaluation-ledger.schema.json",
+  "title": "WF10 Claude-hybrid review evaluation ledger",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "provider", "phase_id", "accepted_contract_digest", "candidate_hash", "manifest_hash", "phases", "metrics", "pre_gate"],
+  "properties": {
+    "schema_version": {"const": "wf10-review-evaluation-v1"},
+    "provider": {"const": "claude-hybrid"},
+    "phase_id": {"type": "string", "minLength": 1},
+    "accepted_contract_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "candidate_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "manifest_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "phases": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["luna_readiness", "terra_initial", "terra_recheck", "convergence", "closure_learning"],
+      "properties": {
+        "luna_readiness": {"$ref": "#/$defs/phase"},
+        "terra_initial": {"$ref": "#/$defs/phase"},
+        "terra_recheck": {"$ref": "#/$defs/phase"},
+        "convergence": {"$ref": "#/$defs/phase"},
+        "closure_learning": {"$ref": "#/$defs/phase"}
+      }
+    },
+    "metrics": {"$ref": "#/$defs/metrics"},
+    "pre_gate": {"$ref": "#/$defs/pre_gate"}
+  },
+  "$defs": {
+    "phase": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "events", "evidence"],
+      "properties": {
+        "status": {"enum": ["OPEN", "PASS", "CHANGES", "BLOCK", "CONVERGENCE_BLOCK"]},
+        "events": {"type": "array", "items": {"type": "string"}},
+        "evidence": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "metrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["validated_luna_findings", "luna_false_negatives", "terra_precision", "terra_cycles_to_pass", "late_findings_on_unchanged_code", "repeated_invariant_clusters", "time_evidence", "token_evidence", "escapes"],
+      "properties": {
+        "validated_luna_findings": {"type": "array", "items": {"type": "string"}},
+        "luna_false_negatives": {"type": "array", "items": {"type": "string"}},
+        "terra_precision": {"type": ["number", "null"], "minimum": 0, "maximum": 1},
+        "terra_cycles_to_pass": {"type": ["integer", "null"], "minimum": 0},
+        "late_findings_on_unchanged_code": {"type": "array", "items": {"type": "string"}},
+        "repeated_invariant_clusters": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["cluster", "occurrences", "first_candidate"],
+            "properties": {
+              "cluster": {"type": "string", "minLength": 1},
+              "occurrences": {"type": "integer", "minimum": 1},
+              "first_candidate": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+            }
+          }
+        },
+        "time_evidence": {
+          "type": ["object", "null"],
+          "additionalProperties": false,
+          "required": ["elapsed_seconds", "source"],
+          "properties": {
+            "elapsed_seconds": {"type": "number", "minimum": 0},
+            "source": {"type": "string", "minLength": 1}
+          }
+        },
+        "token_evidence": {
+          "type": ["object", "null"],
+          "additionalProperties": false,
+          "required": ["source"],
+          "properties": {
+            "input_tokens": {"type": "integer", "minimum": 0},
+            "output_tokens": {"type": "integer", "minimum": 0},
+            "source": {"type": "string", "minLength": 1}
+          }
+        },
+        "escapes": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "pre_gate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["enabled", "retain", "decision", "baseline_terra_cycles", "observed_terra_cycles", "escapes"],
+      "properties": {
+        "enabled": {"type": "boolean"},
+        "retain": {"type": "boolean"},
+        "decision": {"type": "string", "minLength": 1},
+        "baseline_terra_cycles": {"type": "integer", "minimum": 0},
+        "observed_terra_cycles": {"type": "integer", "minimum": 0},
+        "escapes": {"type": "integer", "minimum": 0}
+      },
+      "allOf": [
+        {
+          "if": {"required": ["retain"], "properties": {"retain": {"const": true}}},
+          "then": {
+            "required": ["baseline_terra_cycles", "observed_terra_cycles", "escapes"],
+            "properties": {
+              "escapes": {"const": 0},
+              "observed_terra_cycles": {"x-less-than": "/pre_gate/baseline_terra_cycles"}
+            }
+          }
+        }
+      ]
+    }
+  }
+}

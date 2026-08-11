@@ -1,0 +1,16 @@
+# Refactor Loop — config
+
+loop: refactor
+
+driver: any                        # any worker; behavior-changing decisions escalate to Opus
+
+baseline_cmd: "<TEST_LINT_BUILD>"  # must run BEFORE changes and be green; else abort
+verify_cmd: "<SAME_AS_BASELINE>"   # same checks, run AFTER each change
+
+require_baseline: true             # no green baseline -> do not refactor
+behavior_must_match: true          # any behavior change -> stop & revert the step
+loc_cap: 200                       # keep each refactor step bounded
+failure_budget: 4                  # distinct failures before stop & escalate
+max_retries: 2                     # same error, no new info -> stop
+
+scope: as_requested                # refactor only what was asked; no new features

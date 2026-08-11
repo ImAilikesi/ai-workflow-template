@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "claude-hybrid/wf10-sealed-continuation-v1.schema.json",
+  "title": "Claude-hybrid WF10 sealed continuation handoff",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["provider", "schema_version", "phase_id", "role", "request_marker", "predecessor_uuid", "packet_path", "packet_sha256", "request_state", "quiescence", "successor_count", "successor_uuid", "predecessor_message_count", "duplicate_rejected", "ack"],
+  "properties": {
+    "provider": { "const": "claude-hybrid" },
+    "schema_version": { "const": "wf10-sealed-continuation-v1" },
+    "phase_id": { "type": "string", "minLength": 1, "maxLength": 128 },
+    "role": { "type": "string", "minLength": 1, "maxLength": 128 },
+    "request_marker": { "type": "string", "pattern": "^CONTINUE-[A-Za-z0-9._:-]{1,256}$" },
+    "predecessor_uuid": { "type": "string", "minLength": 1, "maxLength": 128 },
+    "packet_path": { "type": "string", "minLength": 1, "maxLength": 2048 },
+    "packet_sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "request_state": { "enum": ["REQUESTED", "HANDOFF_BLOCK", "ACK_RECORDED", "SUCCESSOR_CREATED"] },
+    "quiescence": { "type": "object", "additionalProperties": false, "required": ["status", "observation_count", "cursor_bound", "event_driven"], "properties": { "status": { "enum": ["PENDING", "VERIFIED", "UNKNOWN"] }, "observation_count": { "type": "integer", "minimum": 0, "maximum": 1 }, "cursor_bound": { "const": true }, "event_driven": { "const": true } } },
+    "successor_count": { "type": "integer", "minimum": 0, "maximum": 1 },
+    "successor_uuid": { "anyOf": [{ "type": "string", "minLength": 1, "maxLength": 128 }, { "type": "null" }] },
+    "predecessor_message_count": { "const": 0 },
+    "duplicate_rejected": { "type": "boolean" },
+    "ack": { "anyOf": [{ "type": "null" }, { "type": "object", "additionalProperties": false, "required": ["request_marker", "predecessor_uuid", "recorded_by", "predecessor_message_created"], "properties": { "request_marker": { "type": "string", "x-equals": "/request_marker" }, "predecessor_uuid": { "type": "string", "minLength": 1, "maxLength": 128, "x-equals": "/predecessor_uuid" }, "recorded_by": { "const": "control" }, "predecessor_message_created": { "const": false } } }] }
+  },
+  "allOf": [
+    { "if": { "properties": { "request_state": { "const": "REQUESTED" } } }, "then": { "properties": { "quiescence": { "properties": { "status": { "const": "PENDING" }, "observation_count": { "const": 0 } } }, "successor_count": { "const": 0 }, "successor_uuid": { "const": null }, "ack": { "const": null } } } },
+    { "if": { "properties": { "request_state": { "const": "HANDOFF_BLOCK" } } }, "then": { "properties": { "quiescence": { "properties": { "status": { "const": "UNKNOWN" }, "observation_count": { "const": 1 } } }, "successor_count": { "const": 0 }, "successor_uuid": { "const": null }, "ack": { "const": null } } } },
+    { "if": { "properties": { "request_state": { "const": "ACK_RECORDED" } } }, "then": { "properties": { "quiescence": { "properties": { "status": { "const": "VERIFIED" }, "observation_count": { "const": 1 } } }, "successor_count": { "const": 0 }, "successor_uuid": { "const": null }, "ack": { "type": "object" } } } },
+    { "if": { "properties": { "request_state": { "const": "SUCCESSOR_CREATED" } } }, "then": { "properties": { "quiescence": { "properties": { "status": { "const": "VERIFIED" }, "observation_count": { "const": 1 } } }, "successor_count": { "const": 1 }, "successor_uuid": { "type": "string", "minLength": 1 }, "ack": { "type": "object" } } } }
+  ]
+}

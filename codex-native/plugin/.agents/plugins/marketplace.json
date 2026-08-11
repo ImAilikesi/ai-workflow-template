@@ -1,0 +1,20 @@
+{
+  "name": "sol-consult-local",
+  "interface": {
+    "displayName": "Sol Consult (local)"
+  },
+  "plugins": [
+    {
+      "name": "sol-consult",
+      "source": {
+        "source": "local",
+        "path": "./plugins/sol-consult"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer Tools"
+    }
+  ]
+}
