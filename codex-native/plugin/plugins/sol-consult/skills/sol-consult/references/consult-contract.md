@@ -12,7 +12,7 @@ independent review, or closure.
 |---|---|---|---|
 | Sol Consult | ChatGPT standard Chat | Project core + explicitly supplied evidence | Advisory only |
 | Sol Advisor | Codex native Sol/High | Independent live-repository exploration | Advisory only |
-| Sol Control Room | Codex native Sol/High | Independent live-repository exploration | Critical phase owner/orchestrator |
+| Sol Owner/Orchestrator | Codex native Sol/High | Independent live-repository exploration | Critical phase owner/orchestrator |
 
 Sol Consult and Sol Advisor are not intelligence tiers. They use Sol-level reasoning for different
 context-acquisition modes.

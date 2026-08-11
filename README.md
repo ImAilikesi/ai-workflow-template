@@ -57,7 +57,7 @@ Role presets live in [`codex-native/roles/`](codex-native/roles/) as Codex agent
 - **Terra** — the independent reviewer. Read-only and scope-bound, fresh context for the initial
   review, and the same lineage for targeted rechecks. Returns `PASS`, `CHANGES`, or `BLOCK`.
 - **Sol** — the deep-reasoning lane, in two distinct forms:
-  - **Sol Control Room** — owns orchestration for a critical phase.
+  - **Sol Owner/Orchestrator** — owns orchestration for a critical phase.
   - **Sol Advisor** — a bounded advisory call for convergence or when the agent must ground itself
     by exploring the repository directly.
 
@@ -78,6 +78,37 @@ agent then verifies every material repository claim against the live tree before
 It is advisory only. It holds no readiness, review, or closure authority, and it never substitutes
 for Terra or for a formal convergence escalation. Details:
 [`codex-native/plugin/plugins/sol-consult/README.md`](codex-native/plugin/plugins/sol-consult/README.md).
+
+### Master Control Room
+
+Everything above is phase-local. A project large enough to run many phases also needs somewhere the
+master plan itself lives. That is the **Master Control Room** — an optional, advanced, project-level
+principal you run as GPT-5.6 Sol/High in its own thread, labelled
+`<Project> · Sol High · Master Control Room`. It is `codex-native` only.
+
+It is not a role preset, not a subagent, and not a phase step. No phase needs it, and no phase can
+start it. Only you invoke and direct it. It has five scopes:
+
+1. **Plan formation** — build and maintain the master plan, before any phase exists.
+2. **Authority resolution** — answer a project-level question the accepted plan governs.
+3. **Cross-phase reconciliation** — reconcile state, dependencies, and sequencing across phases.
+4. **Scoped integration sign-off** — sign off one bounded group of already-closed phases.
+5. **Final project sign-off** — sign off the complete accepted master plan.
+
+The authority boundary is the point. The Master Control Room reads any phase's artifacts as evidence,
+but it never issues `READINESS`, a Terra `VERDICT`, or `CLOSE`/`REOPEN`/`BLOCK` — closure stays with
+the phase owner. It talks to you, and to a phase owner only when you tell it to; phase roles never
+call up into it. It may use Sol Consult on its own judgement, and never native Sol Advisor.
+
+Sign-off is `PASS`, `CHANGES`, or `BLOCK`, plus a 0–100 quality score against a target of 90+. The
+score is diagnostic: it is not a gate, and it moves independently of the verdict.
+
+One lineage is meant to last a long time, because the history is worth keeping. It rotates on a
+health check — reliability, re-groundability, efficiency — not on a turn, age, or token limit.
+
+When Superpowers is installed, plan formation uses its planning skills, normally `brainstorming` then
+`writing-plans`. Those skills shape the plan; they never widen this repository's approval,
+version-control, or external-action rules.
 
 ## Prerequisites
 
@@ -115,7 +146,7 @@ claude-hybrid/            # Claude-orchestrated variant
 
 codex-native/             # Codex-orchestrated variant
   WORKFLOW.md             # the normative phase contract
-  skills/                 # phase-gate + handoff skills (with references/)
+  skills/                 # phase-gate + handoff + master-control-room (with references/)
   roles/                  # Codex agent presets (*.toml)
   plugin/                 # sol-consult plugin, as a ready local marketplace
 
@@ -214,7 +245,13 @@ $sol-consult
 
 # hand a verified checkpoint to a fresh session in the same phase
 $handoff
+
+# run the project-level master-plan authority lane (codex-native)
+$master-control-room
 ```
+
+`$master-control-room` belongs in its own dedicated Sol/High principal thread, not in an ordinary
+phase task. Skip it entirely on a project that runs a handful of phases.
 
 A typical phase reads like this:
 

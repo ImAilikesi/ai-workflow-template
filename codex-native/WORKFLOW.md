@@ -39,10 +39,11 @@ When supported, the Luna parent uses native children for these bounded roles:
 
 The Luna parent remains the phase owner. Children never gain closure authority.
 
-### Critical: Sol Control Room
+### Critical: Sol Owner/Orchestrator
 
-Use a Sol/High Control Room only for money, security, release, consequential data integrity,
-trading truth, major architecture, cross-repository contracts, or an explicit operator request.
+Use a Sol/High phase owner/orchestrator only for money, security, release, consequential data
+integrity, trading truth, major architecture, cross-repository contracts, or an explicit operator
+request.
 
 The Sol parent owns the accepted contract, consequential decisions, review routing, and
 `CLOSE|REOPEN|BLOCK`. It does not implement. When supported, it uses native children for:
@@ -52,7 +53,7 @@ The Sol parent owns the accepted contract, consequential decisions, review routi
 - `independent_reviewer` or `critical_reviewer` — Terra/High or Terra/Max review after writers stop.
 - `volume_worker` — bounded, disjoint Luna/Max work only.
 
-Do not create a `sol_advisor` child in this topology; Sol is already the Control Room.
+Do not create a `sol_advisor` child in this topology; Sol already owns the phase.
 
 The Luna/Max executor owns implementation, integration, tests, remediation, and candidate preparation
 inside the accepted contract. It escalates scope, architecture, public behavior, risk posture, or
@@ -64,7 +65,47 @@ and preserve the exact same role authority and lifecycle. Never create both a na
 fallback principal thread for the same logical role. Fallback does not change phase ownership,
 convergence, review independence, or closure authority.
 
-Do not use a Sol Control Room only because a phase is large, slow, or inconvenient.
+Do not use a Sol Owner/Orchestrator only because a phase is large, slow, or inconvenient.
+
+### Project-level Master Control Room
+
+The Master Control Room is an optional project/master-plan authority layer above the phase
+topologies. Normal phase work does not need it. It is not a native child, not a role preset, not a
+reviewer, and not a phase step. A phase never spawns it.
+
+Run it in a dedicated visible principal thread labelled `<Project> · Sol High · Master Control Room`,
+using GPT-5.6 Sol and High reasoning. The operator is the only authority above it. It has five
+scopes:
+
+1. plan formation and master-plan maintenance;
+2. master authority resolution;
+3. cross-phase reconciliation;
+4. scoped integration sign-off;
+5. final project sign-off.
+
+It inspects the live repository, worktrees, branches, ledgers, plans, and evidence directly. It does
+not implement ordinary phase code and does not replace the phase owner, Luna Readiness, Terra, or
+phase closure. It never issues phase `READINESS`, Terra `VERDICT`, or phase `CLOSE|REOPEN|BLOCK`. It
+may decide that a closed phase must be revisited, but the existing phase owner performs the formal
+`REOPEN` after operator direction.
+
+Normal communication is `Operator <-> Master Control Room`. The Master Control Room contacts a phase
+owner only when the operator explicitly instructs it to deliver that directive. No phase owner,
+executor, worker, readiness reviewer, Terra reviewer, or Sol Advisor uses it as a direct authority
+channel; their artifacts are evidence only.
+
+The Master Control Room may invoke `$sol-consult` on its own judgement when another Sol-level
+reasoning pass is materially useful and the existing Sol Consult contract permits it. It never
+invokes native `sol_advisor`.
+
+Master sign-off uses `MASTER SIGN-OFF: PASS|CHANGES|BLOCK` with an exact scope and a diagnostic
+`QUALITY SCORE: 0-100` against a `TARGET: 90+`. The target is a quality signal, not a gate; verdict
+and score are independent. Master sign-off is never a mandatory phase step.
+
+One Master Control Room lineage is intentionally long-lived. Continuation is health-based, with no
+turn, token, age, phase, or compaction limit, and it does not use the phase `$handoff` skill.
+
+`$master-control-room` owns the detailed procedure. This file owns only authority and topology.
 
 ### External Sol Consult advisory lane
 
@@ -88,12 +129,16 @@ Sol Consult is supplied-context reasoning, not repository self-grounding. Treat 
 about current repository state as advisory until the active Codex owner verifies it against the live
 tree. If the answer requires broad or unknown repository exploration, hidden caller/dependency
 discovery, local commands, or other evidence that is not cheaply bounded, use native Sol Advisor in
-a Luna-owned phase. In a Sol Control Room phase, Sol already owns repo-grounded consequential
-decisions and may still use Sol Consult as an external second reasoning pass.
+a Luna-owned phase. In a Sol-owned critical phase, the Sol Owner/Orchestrator already owns
+repo-grounded consequential decisions and may still use Sol Consult as an external second reasoning
+pass.
 
 Use one advisory lane for one decision. An escalation to native Sol Advisor replaces the Sol Consult
 recommendation for that decision. Do not run both lanes on the same decision at the same time, and do
 not count two advisory opinions as corroboration.
+
+This lane rule governs phase-level decisions. Master Control Room use of Sol Consult is separate
+project-level decision support and never gives Sol Consult master-plan authority.
 
 Sol Consult never substitutes for a formal Sol Advisor convergence escalation, Luna Readiness, Terra
 review, or phase closure. It must not issue workflow `READINESS`, Terra `VERDICT`, or
@@ -219,8 +264,8 @@ the smallest durable correction, and state what evidence would change the recomm
 owner and implements the decision. Earlier or informal Sol Consult use does not satisfy this formal
 convergence escalation.
 
-In a Sol Control Room phase, Sol performs the convergence decision directly. Do not create a Sol
-Advisor child merely to duplicate the Control Room.
+In a Sol-owned critical phase, the Sol Owner/Orchestrator performs the convergence decision directly.
+Do not create a `sol_advisor` child merely to duplicate the phase owner.
 
 A convergence decision may choose a root-cause remediation, review-scope correction, contract/design
 amendment within existing authority, or operator escalation when scope/risk/authority must change.

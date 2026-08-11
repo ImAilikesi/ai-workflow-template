@@ -17,7 +17,7 @@ Use this skill only when the project workflow or accepted plan calls for phase-g
 
 2. **Select topology**
    - Default: Luna/Max parent owns orchestration + execution.
-   - Critical: Sol/High Control Room owns orchestration and uses native children when supported.
+   - Critical: Sol/High owner/orchestrator owns orchestration and uses native children when supported.
    - Do not create extra principals because work is merely large.
 
 3. **Implement**
@@ -59,13 +59,30 @@ Use this skill only when the project workflow or accepted plan calls for phase-g
    - R3 non-PASS → record `CONVERGENCE_ALERT`.
    - If a bounded fix is clear, allow R4 normally.
    - In Luna-owned phases, invoke Sol Advisor when the workflow escalation conditions are met.
-   - In Sol Control Room phases, Sol handles the convergence decision directly.
+   - In Sol-owned critical phases, the Sol Owner/Orchestrator handles the convergence decision directly.
    - Never force PASS or hide findings.
 
 9. **Close**
    - On Terra PASS, verify the reviewed candidate is still current and required gates remain green.
    - The active phase owner issues `CLOSE|REOPEN|BLOCK`.
    - Closure does not authorize commit, push, deploy, spend, secrets, destructive, or external actions.
+
+## Master Control Room directive handling
+
+The Master Control Room is a project-level principal outside the phase lifecycle. It is never a phase
+step, native child, reviewer, or gate. Do not spawn it, message it, or escalate to it. Its scoped or
+final sign-off never substitutes for Luna Readiness, Terra, or phase closure.
+
+If the operator supplies or explicitly authorizes a Master Control Room directive for this phase, the
+active phase owner re-grounds it against the current accepted master plan, the accepted phase
+contract, and the live tree, then acts through the normal phase workflow.
+
+If current evidence conflicts materially with the directive, stop and surface the conflict to the
+operator. Do not silently prefer one authority over the other.
+
+The phase owner stays responsible for implementation, readiness routing, the Terra lineage, and
+formal `CLOSE|REOPEN|BLOCK`. If the Master Control Room finds that a closed phase must change, the
+existing phase owner performs the formal `REOPEN`, and only after operator direction.
 
 ## External Sol Consult handling
 
@@ -92,8 +109,8 @@ Native child/subagent routing is preferred in both topologies when supported:
 
 - A Luna-owned parent uses native `pre_terra_readiness_reviewer`, Terra `independent_reviewer` or
   `critical_reviewer`, `sol_advisor`, and bounded `volume_worker` children.
-- A Sol Control Room parent uses native `luna_executor`, readiness, Terra reviewer, and bounded
-  worker children. It does not create `sol_advisor`; Sol is already the Control Room.
+- A Sol Owner/Orchestrator parent uses native `luna_executor`, readiness, Terra reviewer, and bounded
+  worker children. It does not create `sol_advisor`; Sol already owns the phase.
 
 “Fresh” means a fresh isolated child context, not a separate principal Codex thread. Reviewer
 independence comes from isolated context and role boundaries, not principal-thread status. Terra R1

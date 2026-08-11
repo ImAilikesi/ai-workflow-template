@@ -21,7 +21,7 @@ Use `.claude/WORKFLOW.md` as the authoritative hybrid contract.
    in `.claude/WORKFLOW.md`.
 10. On Terra PASS, Opus verifies candidate/gates and issues `CLOSE|REOPEN|BLOCK`.
 
-Do not create a Sol Control Room for the normal Claude-hybrid workflow.
+Do not create a Sol Owner/Orchestrator for the normal Claude-hybrid workflow.
 
 ## Cross-provider discipline
 

@@ -30,8 +30,8 @@ mandatory gate.
 3. Use native `sol_advisor` in a Luna-owned phase when the task requires broad or unknown repository
    exploration, hidden caller/dependency discovery, local commands, a material context gap that is not
    cheaply bounded, or a formal workflow escalation that specifically requires Sol Advisor.
-4. In a Sol Control Room phase, Sol Consult remains available as an external second reasoning pass, but
-   it never duplicates or replaces Control Room authority.
+4. In a Sol-owned critical phase, Sol Consult remains available as an external second reasoning pass,
+   but it never duplicates or replaces the Sol Owner/Orchestrator's authority.
 
 ## Build the consultation
 

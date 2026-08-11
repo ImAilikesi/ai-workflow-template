@@ -28,7 +28,7 @@ Codex-side roles:
 - Terra/Max — critical review only for the named critical categories.
 - Sol/High Advisor — optional and less readily invoked than in Luna-native workflow.
 
-There is no default Sol Control Room in the Claude workflow.
+There is no default Sol Owner/Orchestrator in the Claude workflow.
 
 Sol Advisor is reserved for unresolved material architectural/strategic ambiguity, repeated review
 convergence problems, or explicit operator request. Opus should decide routine and ordinary difficult
