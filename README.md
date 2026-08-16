@@ -25,17 +25,17 @@ Pick the one that matches who orchestrates the work. A project installs one, not
 | Package | Orchestrator | Use it when |
 |---|---|---|
 | [claude-hybrid/](claude-hybrid/) | Claude owns orchestration and implementation | Claude builds; Codex supplies independent review |
-| [codex-native/](codex-native/) | Codex owns orchestration | Codex drives the phase; Luna executes, Terra reviews |
+| [codex-native/](codex-native/) | Codex owns orchestration | Luna owns normal phases; Sol may delegate or execute directly in a critical phase |
 
 Both define the same lifecycle — re-ground, state the acceptance proof, implement, verify, review,
-close — but differ in topology and authority. The two surfaces are deliberately kept independent so
-a project never runs a merged contract.
+close — but differ in topology and authority. `codex-native` has three native topologies: Luna owner/executor,
+Sol owner plus Luna executor, and Sol owner/executor. The two provider surfaces remain independent.
 
 ## The workflow
 
 A phase runs in a fixed order. The normative contract is
-[`codex-native/WORKFLOW.md`](codex-native/WORKFLOW.md) (or the `claude-hybrid` equivalent); the
-procedure invoked at each lifecycle moment is the `phase-gate` skill.
+[`codex-native/WORKFLOW.md`](codex-native/WORKFLOW.md) or the `claude-hybrid` equivalent. The procedure
+invoked at each lifecycle moment is the `phase-gate` skill.
 
 1. **Re-ground** from the live tree and the accepted contract. Never from memory alone.
 2. **State** the smallest acceptance proof and the named deterministic gates.
@@ -54,10 +54,13 @@ retry loop.
 Role presets live in [`codex-native/roles/`](codex-native/roles/) as Codex agent `*.toml` files.
 
 - **Luna** — the executor. Implements inside the accepted scope.
+- **Luna Research Worker** — a read-only Luna/Max child that helps the active executor answer a bounded
+  question. The executor may create up to five concurrent workers, and stops them before candidate freeze.
 - **Terra** — the independent reviewer. Read-only and scope-bound, fresh context for the initial
   review, and the same lineage for targeted rechecks. Returns `PASS`, `CHANGES`, or `BLOCK`.
-- **Sol** — the deep-reasoning lane, in two distinct forms:
+- **Sol** — the deep-reasoning lane, in three distinct forms:
   - **Sol Owner/Orchestrator** — owns orchestration for a critical phase.
+  - **Sol Owner/Executor** — owns both functions in `codex-native`; Sol is the only writer.
   - **Sol Advisor** — a bounded advisory call for convergence or when the agent must ground itself
     by exploring the repository directly.
 
@@ -186,11 +189,12 @@ than copying a file over your existing config:
 
 ```toml
 [agents]
-max_threads = 4
-max_depth = 1
+max_threads = 10
+max_depth = 5
 ```
 
-Raise the values only when you know the review lineage stays legible at that width and depth.
+These values provide headroom for a nested Luna executor and its five concurrent Luna research workers. Do
+not raise them unless you accept broader concurrent work and can keep the review lineage legible.
 
 ### Global — the sol-consult plugin (optional)
 
@@ -295,7 +299,7 @@ rm -rf <project>/.claude/WORKFLOW.md <project>/.claude/skills <project>/.claude/
 rm -rf <project>/.codex/WORKFLOW.md <project>/.agents/skills
 
 # global
-rm -f ~/.codex/agents/{luna_executor,independent_reviewer,critical_reviewer,sol_advisor,volume_worker,pre_terra_readiness_reviewer}.toml
+rm -f ~/.codex/agents/{luna_executor,luna_research_worker,independent_reviewer,critical_reviewer,sol_advisor,volume_worker,pre_terra_readiness_reviewer}.toml
 
 # sol-consult plugin
 codex plugin remove sol-consult@sol-consult-local
