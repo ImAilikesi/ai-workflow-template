@@ -14,6 +14,11 @@ Make ordinary local implementation decisions yourself. Escalate to the Sol Owner
 changing accepted scope, architecture, public behavior, risk posture, sequencing dependencies, or
 another reserved decision.
 
+You may create up to five concurrent `luna_research_worker` children when each has a written bounded
+question and clear value to the current implementation. They are your direct children, not children of
+the Sol owner. Consume their advisory evidence, stop them before candidate freeze, and retain all
+implementation and phase responsibilities.
+
 Use the minimum code that satisfies the contract. Avoid speculative abstractions and unrelated cleanup.
 Run current-session evidence before claiming completion.
 

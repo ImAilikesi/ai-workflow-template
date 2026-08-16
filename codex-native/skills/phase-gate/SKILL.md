@@ -17,11 +17,16 @@ Use this skill only when the project workflow or accepted plan calls for phase-g
 
 2. **Select topology**
    - Default: Luna/Max parent owns orchestration + execution.
-   - Critical: Sol/High owner/orchestrator owns orchestration and uses native children when supported.
+   - Critical delegated: Sol/High owner/orchestrator owns orchestration and uses `luna_executor`.
+   - Critical direct: Sol/High owner/executor owns orchestration + execution.
    - Do not create extra principals because work is merely large.
 
 3. **Implement**
    - Keep file ownership clear.
+   - The active executor may create up to five concurrent `luna_research_worker` children when each has a
+     written bounded read-only question that can help implementation. Their evidence is advisory. In the
+     Sol Owner/Orchestrator topology, these are children of `luna_executor`, not of Sol. In the Sol
+     Owner/Executor topology, they are direct Sol children. Stop them before candidate freeze.
    - Use external `$sol-consult` when a meaningful design, diagnosis, review, or trade-off would benefit
      from another Sol-level reasoning pass and the needed context can be supplied explicitly.
    - Use `volume_worker` only for disjoint bounded slices.
@@ -59,7 +64,7 @@ Use this skill only when the project workflow or accepted plan calls for phase-g
    - R3 non-PASS → record `CONVERGENCE_ALERT`.
    - If a bounded fix is clear, allow R4 normally.
    - In Luna-owned phases, invoke Sol Advisor when the workflow escalation conditions are met.
-   - In Sol-owned critical phases, the Sol Owner/Orchestrator handles the convergence decision directly.
+   - In Sol-owned critical phases, the Sol phase owner handles the convergence decision directly.
    - Never force PASS or hide findings.
 
 9. **Close**
@@ -105,12 +110,17 @@ formal convergence escalation.
 
 ## Native child handling
 
-Native child/subagent routing is preferred in both topologies when supported:
+Native child/subagent routing is preferred in all three topologies when supported:
 
 - A Luna-owned parent uses native `pre_terra_readiness_reviewer`, Terra `independent_reviewer` or
-  `critical_reviewer`, `sol_advisor`, and bounded `volume_worker` children.
-- A Sol Owner/Orchestrator parent uses native `luna_executor`, readiness, Terra reviewer, and bounded
-  worker children. It does not create `sol_advisor`; Sol already owns the phase.
+  `critical_reviewer`, `sol_advisor`, optional `luna_research_worker`, and bounded `volume_worker`
+  children.
+- A Sol Owner/Orchestrator parent uses native `luna_executor`, readiness, Terra reviewer, and bounded worker
+  children. Its `luna_executor` may create up to five concurrent `luna_research_worker` children. Sol does
+  not create `sol_advisor`; Sol already owns the phase.
+- A Sol Owner/Executor parent uses native `luna_research_worker`, readiness, and Terra reviewer children. It
+  may create up to five concurrent research workers. It does not create `luna_executor`, `volume_worker`, or
+  `sol_advisor` children.
 
 “Fresh” means a fresh isolated child context, not a separate principal Codex thread. Reviewer
 independence comes from isolated context and role boundaries, not principal-thread status. Terra R1
@@ -128,7 +138,9 @@ Give every child a role-bound label:
 - `<Phase> · Terra High · Review`
 - `<Phase> · Terra Max · Critical Review`
 - `<Phase> · Sol High · Advisor`
+- `<Phase> · Sol High · Owner/Executor`
 - `<Phase> · Luna Max · Executor`
+- `<Phase> · Luna Max · Research`
 - `<Phase> · Luna Max · Worker`
 
 For native spawned children, use one direct long child wait. If the wait runs inside a wrapper cell

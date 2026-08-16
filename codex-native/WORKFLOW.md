@@ -9,7 +9,7 @@ None of them should duplicate this contract.
 Use the simplest topology that fits the phase. Separate contexts by responsibility, but preserve
 one logical lineage for repeated work inside the same responsibility.
 
-Native child/subagent routing is preferred in both native topologies whenever supported. “Fresh”
+Native child/subagent routing is preferred in all three native topologies whenever supported. “Fresh”
 means a fresh isolated child context, not a separate principal Codex thread. Reviewer independence
 comes from isolated context and role boundaries, not principal-thread status.
 
@@ -35,9 +35,13 @@ When supported, the Luna parent uses native children for these bounded roles:
 - `independent_reviewer` — Terra/High, read-only.
 - `critical_reviewer` — Terra/Max, read-only, only for the critical categories below.
 - `sol_advisor` — Sol/High, read-only, optional.
+- `luna_research_worker` — Luna/Max, up to five concurrent read-only children for the parent executor.
 - `volume_worker` — Luna/Max, bounded implementation only.
 
-The Luna parent remains the phase owner. Children never gain closure authority.
+Each research worker receives one bounded question and returns a compact evidence packet. The executor may
+create up to five concurrent research workers while it implements, but they never write, review, or decide.
+The executor must stop them before candidate freeze. The Luna parent remains the phase owner. Children never
+gain closure authority.
 
 ### Critical: Sol Owner/Orchestrator
 
@@ -49,6 +53,7 @@ The Sol parent owns the accepted contract, consequential decisions, review routi
 `CLOSE|REOPEN|BLOCK`. It does not implement. When supported, it uses native children for:
 
 - `luna_executor` — Luna/Max implementation and remediation.
+- `luna_research_worker` — Luna/Max, up to five concurrent read-only children of `luna_executor`.
 - `pre_terra_readiness_reviewer` — Luna/Max readiness after writers stop.
 - `independent_reviewer` or `critical_reviewer` — Terra/High or Terra/Max review after writers stop.
 - `volume_worker` — bounded, disjoint Luna/Max work only.
@@ -56,8 +61,9 @@ The Sol parent owns the accepted contract, consequential decisions, review routi
 Do not create a `sol_advisor` child in this topology; Sol already owns the phase.
 
 The Luna/Max executor owns implementation, integration, tests, remediation, and candidate preparation
-inside the accepted contract. It escalates scope, architecture, public behavior, risk posture, or
-sequencing changes to Sol before acting.
+inside the accepted contract. It may directly create up to five concurrent `luna_research_worker` children,
+each for one bounded question. They stop before candidate freeze. The executor escalates scope, architecture,
+public behavior, risk posture, or sequencing changes to Sol before acting.
 
 If native child creation actually fails because of registration, runtime, platform, or supported-tool
 limitations, a separate visible principal thread is an acceptable fallback. Record the reason once
@@ -66,6 +72,25 @@ fallback principal thread for the same logical role. Fallback does not change ph
 convergence, review independence, or closure authority.
 
 Do not use a Sol Owner/Orchestrator only because a phase is large, slow, or inconvenient.
+
+### Critical: Sol Owner/Executor
+
+Use a Sol/High owner/executor only for the same critical categories as the Sol Owner/Orchestrator route,
+when the accepted phase requires Sol to implement directly.
+
+One Sol/High parent owns the accepted contract, implementation, integration, verification, candidate
+preparation, remediation, convergence decisions, and `CLOSE|REOPEN|BLOCK`. Sol is the only writer in this
+topology. When supported, it uses native children for:
+
+- `luna_research_worker` — Luna/Max, up to five concurrent read-only children of the Sol executor.
+- `pre_terra_readiness_reviewer` — Luna/Max readiness after writers stop.
+- `independent_reviewer` or `critical_reviewer` — Terra/High or Terra/Max review after writers stop.
+
+Each research worker receives one bounded question and returns an advisory evidence packet. Sol may create up
+to five concurrent research workers while it implements. Stop them before candidate freeze.
+
+Do not create `luna_executor`, `volume_worker`, or `sol_advisor` children in this topology. Do not use this
+topology only because a phase is large, slow, or inconvenient.
 
 ### Project-level Master Control Room
 
@@ -109,7 +134,7 @@ turn, token, age, phase, or compaction limit, and it does not use the phase `$ha
 
 ### External Sol Consult advisory lane
 
-`sol_consult` is an external advisory role available to the active phase owner in either native
+`sol_consult` is an external advisory role available to the active phase owner in any native
 topology. It runs in the repository's dedicated ChatGPT Project using standard Chat with GPT-5.6
 Sol and High reasoning. It is not a native child, writer, reviewer, gate, phase owner, or
 continuation lineage.
@@ -129,9 +154,8 @@ Sol Consult is supplied-context reasoning, not repository self-grounding. Treat 
 about current repository state as advisory until the active Codex owner verifies it against the live
 tree. If the answer requires broad or unknown repository exploration, hidden caller/dependency
 discovery, local commands, or other evidence that is not cheaply bounded, use native Sol Advisor in
-a Luna-owned phase. In a Sol-owned critical phase, the Sol Owner/Orchestrator already owns
-repo-grounded consequential decisions and may still use Sol Consult as an external second reasoning
-pass.
+a Luna-owned phase. In a Sol-owned critical phase, the Sol phase owner already owns repo-grounded
+consequential decisions and may still use Sol Consult as an external second reasoning pass.
 
 Use one advisory lane for one decision. An escalation to native Sol Advisor replaces the Sol Consult
 recommendation for that decision. Do not run both lanes on the same decision at the same time, and do
@@ -264,8 +288,8 @@ the smallest durable correction, and state what evidence would change the recomm
 owner and implements the decision. Earlier or informal Sol Consult use does not satisfy this formal
 convergence escalation.
 
-In a Sol-owned critical phase, the Sol Owner/Orchestrator performs the convergence decision directly.
-Do not create a `sol_advisor` child merely to duplicate the phase owner.
+In a Sol-owned critical phase, the Sol phase owner performs the convergence decision directly. Do not
+create a `sol_advisor` child merely to duplicate the phase owner.
 
 A convergence decision may choose a root-cause remediation, review-scope correction, contract/design
 amendment within existing authority, or operator escalation when scope/risk/authority must change.
