@@ -2,13 +2,14 @@
 Codex instructions for the AI Workflow Template repository itself.
 
 Note: this repository *ships* workflow templates. It does not *run* any shipped phase workflow on
-itself. Do not install `.codex/`, `.agents/`, `.claude/`, `.dsh/`, `.cursor/`, or `.pi/` here — those
-are install destinations in consuming projects, not part of this tree.
+itself. Do not install `.codex/`, `.agents/`, `.claude/`, `.dsh/`, `.cursor/`, `.pi/`,
+`.commandcode/`, or `.opencode/` here — those are install destinations in consuming projects, not
+part of this tree.
 
 # Project
 Source-of-truth templates for a phase-gated AI engineering workflow across Claude, Codex, DSH,
-Cursor, and Pi. Content only: instruction files, workflow contracts, skills, role presets, execution
-loops, and harness-specific role prompts.
+Cursor, Pi, Command Code, and OpenCode. Content only: instruction files, workflow contracts, skills,
+role presets, execution loops, and harness-specific role prompts.
 
 # Stack
 Markdown, YAML, TOML, and JSON Schema. No build, no runtime, no dependencies.
@@ -22,6 +23,8 @@ No test, build, or lint tooling. Verification is structural — see Local Rules.
 - `dsh-native/` — DSH-orchestrated variant: `WORKFLOW.md`, namespaced `skills/`.
 - `cursor-native/` — Cursor-orchestrated variant: `WORKFLOW.md`, namespaced `skills/`, `agents/`.
 - `pi-native/` — Pi-orchestrated variant: `WORKFLOW.md`, namespaced `skills/`.
+- `commandcode-native/` — Command Code-orchestrated variant: `WORKFLOW.md`, namespaced `skills/`, `agents/`.
+- `opencode-native/` — OpenCode-orchestrated variant: `WORKFLOW.md`, namespaced `skills/`, `agents/`.
 - `templates/` — harness-specific global instructions plus shared project `AGENTS.md` and Claude
   project `CLAUDE.md` templates.
 - `README.md` — the public entry point: what each file is and where it installs.
@@ -29,18 +32,19 @@ No test, build, or lint tooling. Verification is structural — see Local Rules.
 
 # External Dependencies
 Install destinations only: `~/.codex/AGENTS.md`, `~/.codex/agents/`, `~/.claude/CLAUDE.md`,
-`$DSH_HOME/AGENTS.md` (default `~/.dsh/AGENTS.md`), `~/.pi/agent/AGENTS.md`, Cursor User Rules, and the
+`$DSH_HOME/AGENTS.md` (default `~/.dsh/AGENTS.md`), `~/.pi/agent/AGENTS.md`,
+`~/.commandcode/AGENTS.md`, `~/.config/opencode/AGENTS.md`, Cursor User Rules, and the
 harness-specific project directories in consuming repositories. Nothing here reads them back.
 
 # Current Status
-Five harness packages plus `templates/`. Each harness package is the single source for its native
+Seven harness packages plus `templates/`. Each harness package is the single source for its native
 workflow surface; there are no installed copies inside this repository.
 
 # Workflow
 This repository is the source of `codex-native/WORKFLOW.md`, `claude-hybrid/WORKFLOW.md`,
-`dsh-native/WORKFLOW.md`, `cursor-native/WORKFLOW.md`, and `pi-native/WORKFLOW.md`. Those files are
-content to edit, not contracts that govern work in this repository. Ordinary edits here need no phase
-lifecycle.
+`dsh-native/WORKFLOW.md`, `cursor-native/WORKFLOW.md`, `pi-native/WORKFLOW.md`,
+`commandcode-native/WORKFLOW.md`, and `opencode-native/WORKFLOW.md`. Those files are content to edit,
+not contracts that govern work in this repository. Ordinary edits here need no phase lifecycle.
 
 Keep harness surfaces independent. A shared lifecycle idea must be expressed in each harness's own
 native terms. Do not copy one harness's topology, tool names, model assumptions, or install paths into
@@ -56,11 +60,11 @@ None. The `skills/` directories are shipped artifacts, not skills active in this
   project facts belong in `templates/project-AGENTS.md`; Claude keeps its separate
   `templates/project-CLAUDE.md` surface.
 - **Global template naming is intentional.** `templates/global-AGENTS.md` is the Codex global
-  `AGENTS.md` template and keeps that filename. DSH and Pi use their separately named global AGENTS
-  templates; Cursor uses a User Rules template.
-- **Namespaced new workflow skills.** DSH, Cursor, and Pi workflow skill names include the harness
-  prefix so projects can contain several harness packages without same-name skill collisions. Do not
-  rename the existing Codex skills as part of unrelated work.
+  `AGENTS.md` template and keeps that filename. DSH, Pi, Command Code, and OpenCode use separately
+  named global AGENTS templates; Cursor uses a User Rules template.
+- **Namespaced new workflow skills.** DSH, Cursor, Pi, Command Code, and OpenCode workflow skill names
+  include the harness prefix so projects can contain several harness packages without same-name skill
+  collisions. Do not rename the existing Codex skills as part of unrelated work.
 - **Paths inside a package are consumer paths.** A reference to `.dsh/WORKFLOW.md` inside
   `dsh-native/`, for example, describes where the file lands in a consuming project. Do not rewrite
   it to match this repository's layout.
