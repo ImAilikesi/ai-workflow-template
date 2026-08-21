@@ -1,6 +1,6 @@
 # Provider
-Shared project instructions for AGENTS.md-compatible harnesses: Codex, DSH, Cursor, and Pi.
-This file contains project-specific rules only.
+Shared project instructions for AGENTS.md-compatible harnesses: Codex, DSH, Cursor, Pi, Command Code,
+and OpenCode. This file contains project-specific rules only.
 
 # Project
 [What this project does — 2 lines max]
@@ -32,6 +32,11 @@ may coexist in one repository; their workflow mechanics must not be combined.
   `.cursor/skills/cursor-handoff/`; custom roles are `.cursor/agents/`.
 - Pi: `.pi/WORKFLOW.md`; workflow skills are `.pi/skills/pi-phase-gate/` and
   `.pi/skills/pi-handoff/`.
+- Command Code: `.commandcode/WORKFLOW.md`; workflow skills are
+  `.commandcode/skills/commandcode-phase-gate/` and `.commandcode/skills/commandcode-handoff/`;
+  custom roles are `.commandcode/agents/`.
+- OpenCode: `.opencode/WORKFLOW.md`; workflow skills are `.opencode/skills/opencode-phase-gate/` and
+  `.opencode/skills/opencode-handoff/`; custom roles are `.opencode/agents/`.
 
 If the active harness has no installed workflow package, use the simplest execution path allowed by
 its global instructions and this file.
