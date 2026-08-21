@@ -19,11 +19,11 @@ closes on the builder's own say-so.
 It is a set of agreements, not a framework. There is nothing to import and nothing to run from this
 repository itself.
 
-## Five harness packages
+## Seven harness packages
 
 Install the package for the harness that owns the current session. Several packages may coexist in the
-same consuming repository because their workflow files, new workflow skill names, and native role
-surfaces are isolated.
+same consuming repository because their workflow files, workflow skill names, and native role surfaces
+are isolated.
 
 | Package | Orchestrator | Native shape |
 |---|---|---|
@@ -32,8 +32,10 @@ surfaces are isolated.
 | [dsh-native/](dsh-native/) | DeepSeek Harness (DSH) | DSH parent plus optional inherited-model subagents/workflows |
 | [cursor-native/](cursor-native/) | Cursor | Cursor parent plus custom inherited-model read-only subagents |
 | [pi-native/](pi-native/) | Pi | Pi owner plus same-model isolated review sessions; child extensions are optional |
+| [commandcode-native/](commandcode-native/) | Command Code | Command Code parent plus custom read-only agents and native skills |
+| [opencode-native/](opencode-native/) | OpenCode | OpenCode primary agent plus inherited-model read-only subagents |
 
-All five implement the same abstract lifecycle in harness-native terms:
+All seven implement the same abstract lifecycle in harness-native terms:
 
 `GROUND -> CONTRACT -> IMPLEMENT -> VERIFY -> FREEZE -> READINESS -> REVIEW -> CLOSE`
 
@@ -42,8 +44,9 @@ facts are shared; execution mechanics are not.
 
 ## Shared project instructions
 
-`templates/project-AGENTS.md` is the single project scaffold for Codex, DSH, Cursor, and Pi. Copy it
-once to `<project>/AGENTS.md`, then fill its placeholders with real project facts.
+`templates/project-AGENTS.md` is the single project scaffold for Codex, DSH, Cursor, Pi, Command Code,
+and OpenCode. Copy it once to `<project>/AGENTS.md`, then fill its placeholders with real project
+facts.
 
 That shared file routes each active harness to its own workflow:
 
@@ -53,14 +56,16 @@ That shared file routes each active harness to its own workflow:
 | DSH | `.dsh/WORKFLOW.md` | `.dsh/skills/dsh-phase-gate/`, `.dsh/skills/dsh-handoff/` |
 | Cursor | `.cursor/WORKFLOW.md` | `.cursor/skills/cursor-phase-gate/`, `.cursor/skills/cursor-handoff/`, `.cursor/agents/` |
 | Pi | `.pi/WORKFLOW.md` | `.pi/skills/pi-phase-gate/`, `.pi/skills/pi-handoff/` |
+| Command Code | `.commandcode/WORKFLOW.md` | `.commandcode/skills/commandcode-phase-gate/`, `.commandcode/skills/commandcode-handoff/`, `.commandcode/agents/` |
+| OpenCode | `.opencode/WORKFLOW.md` | `.opencode/skills/opencode-phase-gate/`, `.opencode/skills/opencode-handoff/`, `.opencode/agents/` |
 
 Claude keeps `templates/project-CLAUDE.md` because Claude Code uses its own project instruction
 surface.
 
-The new DSH, Cursor, and Pi workflow skills are namespaced deliberately. Cursor currently discovers
-skills from several compatibility roots, and duplicate same-name skills can be surfaced separately.
-Namespacing prevents a co-installed Codex `phase-gate` or `handoff` from colliding with another
-harness's workflow skill.
+The DSH, Cursor, Pi, Command Code, and OpenCode workflow skills are namespaced deliberately. Several
+harnesses discover compatibility skill roots, and duplicate same-name skills can collide or be
+surfaced separately. Namespacing prevents a co-installed Codex `phase-gate` or `handoff` from
+colliding with another harness's workflow skill.
 
 ## The workflow
 
@@ -131,6 +136,29 @@ lineage. The base package does not depend on an extension.
 
 The normative contract is [`pi-native/WORKFLOW.md`](pi-native/WORKFLOW.md).
 
+### Command Code-native
+
+Command Code uses one active session as owner/executor plus custom project agents for bounded research,
+readiness, normal independent review, and critical independent review. The shipped custom agents live
+under `.commandcode/agents/` and expose only read-only tools for those roles.
+
+The package does not pin a model or provider. Command Code model/provider selection remains a session
+or user concern, and the workflow does not switch models merely to seek a different review verdict.
+Review lineage is preserved explicitly across isolated custom-agent contexts.
+
+The normative contract is [`commandcode-native/WORKFLOW.md`](commandcode-native/WORKFLOW.md).
+
+### OpenCode-native
+
+OpenCode uses one primary agent as owner/executor plus project subagents for bounded research,
+readiness, normal independent review, and critical independent review.
+
+The shipped OpenCode subagent files intentionally omit `model`. OpenCode therefore uses the model of
+the primary agent that invoked the subagent. Reviewer files deny edit, bash, and nested task
+delegation. Child sessions preserve isolation while the parent preserves one logical review lineage.
+
+The normative contract is [`opencode-native/WORKFLOW.md`](opencode-native/WORKFLOW.md).
+
 ### Sol Consult
 
 `sol-consult` remains an optional Codex plugin for one supplied-context reasoning pass in a dedicated
@@ -147,7 +175,7 @@ integration sign-off, and final project sign-off. It never becomes a phase revie
 and a phase never spawns it.
 
 Use [`codex-native/skills/master-control-room/`](codex-native/skills/master-control-room/) for that
-lane. It is not part of DSH, Cursor, Pi, or Claude workflows.
+lane. It is not part of the other harness workflows.
 
 ## Prerequisites
 
@@ -159,6 +187,8 @@ Install only the products you actually use:
 - [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) — `dsh-native`.
 - [Cursor](https://cursor.com/) — `cursor-native`.
 - [Pi](https://pi.dev/) — `pi-native`.
+- [Command Code](https://commandcode.ai/) — `commandcode-native`.
+- [OpenCode](https://opencode.ai/) — `opencode-native`.
 - Python 3.9+ — only for the optional `sol-consult` fallback helper.
 
 The workflow files themselves install no packages and make no network calls. Harness products,
@@ -202,14 +232,38 @@ pi-native/
     pi-phase-gate/
     pi-handoff/
 
+commandcode-native/
+  WORKFLOW.md
+  skills/
+    commandcode-phase-gate/
+    commandcode-handoff/
+  agents/
+    workflow-research-worker.md
+    workflow-readiness-reviewer.md
+    workflow-independent-reviewer.md
+    workflow-critical-reviewer.md
+
+opencode-native/
+  WORKFLOW.md
+  skills/
+    opencode-phase-gate/
+    opencode-handoff/
+  agents/
+    workflow-research-worker.md
+    workflow-readiness-reviewer.md
+    workflow-independent-reviewer.md
+    workflow-critical-reviewer.md
+
 templates/
   global-CLAUDE.md
-  global-AGENTS.md             # Codex global AGENTS.md; filename intentionally unchanged
+  global-AGENTS.md                 # Codex global AGENTS.md; filename intentionally unchanged
   global-DSH-AGENTS.md
   global-CURSOR-USER-RULES.md
   global-PI-AGENTS.md
+  global-COMMANDCODE-AGENTS.md
+  global-OPENCODE-AGENTS.md
   project-CLAUDE.md
-  project-AGENTS.md            # shared by Codex, DSH, Cursor, Pi
+  project-AGENTS.md                # shared by six AGENTS.md-compatible harnesses
 ```
 
 ## Install
@@ -225,18 +279,20 @@ instruction files before replacing them.
 | `templates/global-AGENTS.md` | `~/.codex/AGENTS.md` |
 | `templates/global-DSH-AGENTS.md` | `$DSH_HOME/AGENTS.md` (default `~/.dsh/AGENTS.md`) |
 | `templates/global-PI-AGENTS.md` | `~/.pi/agent/AGENTS.md` |
+| `templates/global-COMMANDCODE-AGENTS.md` | `~/.commandcode/AGENTS.md` |
+| `templates/global-OPENCODE-AGENTS.md` | `~/.config/opencode/AGENTS.md` |
 | `templates/global-CURSOR-USER-RULES.md` | Cursor **Customize -> Rules -> User Rules** (paste contents) |
 | `codex-native/roles/*.toml` | `~/.codex/agents/` when using Codex-native roles |
 
-`templates/global-AGENTS.md` is intentionally the **Codex** global template. It is not renamed and it
-is not the DSH/Pi global file. DSH and Pi use the separately named source templates above because
-their destination paths are different. Cursor uses User Rules because Cursor has no equivalent global
+`templates/global-AGENTS.md` is intentionally the **Codex** global template. It is not renamed.
+DSH, Pi, Command Code, and OpenCode use separately named source templates because their global
+instruction destinations differ. Cursor uses User Rules because Cursor has no equivalent global
 `AGENTS.md` destination.
 
 Create the file-system destinations you need:
 
 ```sh
-mkdir -p ~/.claude ~/.codex/agents ~/.dsh ~/.pi/agent
+mkdir -p ~/.claude ~/.codex/agents ~/.dsh ~/.pi/agent ~/.commandcode ~/.config/opencode
 ```
 
 If `DSH_HOME` is configured to another location, copy the DSH global file there instead of `~/.dsh`.
@@ -263,7 +319,7 @@ codex plugin add sol-consult@sol-consult-local
 
 Install it from one location only. Do not also copy its skill into another Codex skill root.
 
-### Shared project instructions — Codex / DSH / Cursor / Pi
+### Shared project instructions — Codex / DSH / Cursor / Pi / Command Code / OpenCode
 
 Copy this once even when several harness packages coexist:
 
@@ -317,24 +373,51 @@ surfaces and duplicate rules waste context.
 Pi asks for project trust before loading project-local `.pi` resources in interactive use. Keep that
 trust boundary intact.
 
+### Per project — Command Code-native
+
+| From | To |
+|---|---|
+| `commandcode-native/WORKFLOW.md` | `<project>/.commandcode/WORKFLOW.md` |
+| `commandcode-native/skills/` | `<project>/.commandcode/skills/` |
+| `commandcode-native/agents/` | `<project>/.commandcode/agents/` |
+
+Command Code reads the shared root `<project>/AGENTS.md`; do not also copy it to
+`<project>/.commandcode/AGENTS.md` unless you intentionally want a separate Command Code-only project
+memory file.
+
+### Per project — OpenCode-native
+
+| From | To |
+|---|---|
+| `opencode-native/WORKFLOW.md` | `<project>/.opencode/WORKFLOW.md` |
+| `opencode-native/skills/` | `<project>/.opencode/skills/` |
+| `opencode-native/agents/` | `<project>/.opencode/agents/` |
+
+OpenCode reads the shared root `<project>/AGENTS.md`. Because it also discovers compatibility skill
+roots such as `.agents/skills/`, keep the OpenCode workflow skill names namespaced.
+
 ## Using it
 
 Invoke the workflow skill that belongs to the active harness:
 
 ```text
-Codex:   $phase-gate
-DSH:     dsh-phase-gate
-Cursor:  /cursor-phase-gate
-Pi:      /skill:pi-phase-gate
+Codex:        $phase-gate
+DSH:          dsh-phase-gate
+Cursor:       /cursor-phase-gate
+Pi:           /skill:pi-phase-gate
+Command Code: /commandcode-phase-gate
+OpenCode:     opencode-phase-gate
 ```
 
 Handoff skills follow the same naming pattern:
 
 ```text
-Codex:   $handoff
-DSH:     dsh-handoff
-Cursor:  /cursor-handoff
-Pi:      /skill:pi-handoff
+Codex:        $handoff
+DSH:          dsh-handoff
+Cursor:       /cursor-handoff
+Pi:           /skill:pi-handoff
+Command Code: /commandcode-handoff
+OpenCode:     opencode-handoff
 ```
 
 Exact command presentation can vary by product UI. The skill name and native skill root are the source
@@ -366,8 +449,11 @@ These rules are common across packages even though each harness expresses them i
 - Broad phrasing such as `fix`, `clean`, `finish`, or `full access` does not grant destructive or
   external authority.
 - Model choice does not change authority.
-- DSH and Pi do not silently switch models for workflow roles. Cursor custom workflow subagents use
-  `model: inherit`.
+- DSH and Pi do not silently switch models for workflow roles.
+- Cursor custom workflow subagents use `model: inherit`.
+- OpenCode workflow subagents omit `model`, which makes them inherit the invoking primary agent's
+  model.
+- Command Code workflow files do not pin a provider/model and keep model choice at session/user scope.
 
 ## Uninstall
 
@@ -380,6 +466,8 @@ rm -rf <project>/.codex/WORKFLOW.md <project>/.agents/skills
 rm -rf <project>/.dsh/WORKFLOW.md <project>/.dsh/skills
 rm -rf <project>/.cursor/WORKFLOW.md <project>/.cursor/skills <project>/.cursor/agents
 rm -rf <project>/.pi/WORKFLOW.md <project>/.pi/skills
+rm -rf <project>/.commandcode/WORKFLOW.md <project>/.commandcode/skills <project>/.commandcode/agents
+rm -rf <project>/.opencode/WORKFLOW.md <project>/.opencode/skills <project>/.opencode/agents
 
 # Codex global role presets
 rm -f ~/.codex/agents/{luna_executor,luna_research_worker,independent_reviewer,critical_reviewer,sol_advisor,volume_worker,pre_terra_readiness_reviewer}.toml
@@ -396,13 +484,16 @@ Restore any global instruction files or Cursor User Rules from the backups you m
 
 - **Agent-dependent.** These are instructions, not enforcement. A model that ignores them is not
   technically blocked from a tool call.
-- **Harness behavior changes.** DSH, Cursor, Pi, Claude, and Codex evolve quickly. Discovery paths,
-  subagent behavior, model inheritance, and plugin formats must be re-verified when vendor behavior
-  changes.
-- **Cursor read-only roles are contractual.** The shipped custom subagent files do not rely on an
-  undocumented tool-restriction frontmatter field. Their prompts define read-only authority even if
-  the active product exposes write-capable tools.
+- **Harness behavior changes.** DSH, Cursor, Pi, Command Code, OpenCode, Claude, and Codex evolve
+  quickly. Discovery paths, subagent behavior, model inheritance, and plugin formats must be
+  re-verified when vendor behavior changes.
+- **Cursor read-only roles are contractual.** Their prompts define read-only authority even if the
+  active product exposes write-capable tools.
 - **Pi base workflow is session-based.** It does not install or require a subagent extension.
+- **Command Code agent permissions use explicit read-only tool lists.** The workflow still treats the
+  role prompt as the authority boundary.
+- **OpenCode subagent inheritance depends on leaving `model` unset.** Adding a model field to a
+  workflow reviewer changes that contract.
 - **Manual install with no versioning.** Copies can drift from this source; there is no update command.
 - **Overhead is real.** The full phase lifecycle is for consequential changes. Small work should stay
   single-agent.
