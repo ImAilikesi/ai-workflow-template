@@ -406,7 +406,7 @@ DSH:          dsh-phase-gate
 Cursor:       /cursor-phase-gate
 Pi:           /skill:pi-phase-gate
 Command Code: /commandcode-phase-gate
-OpenCode:     opencode-phase-gate
+OpenCode:     /opencode-phase-gate
 ```
 
 Handoff skills follow the same naming pattern:
@@ -417,7 +417,7 @@ DSH:          dsh-handoff
 Cursor:       /cursor-handoff
 Pi:           /skill:pi-handoff
 Command Code: /commandcode-handoff
-OpenCode:     opencode-handoff
+OpenCode:     /opencode-handoff
 ```
 
 Exact command presentation can vary by product UI. The skill name and native skill root are the source
