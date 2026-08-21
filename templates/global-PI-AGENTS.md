@@ -81,8 +81,8 @@ workflow contract, use separate sessions instead.
 ## 11. Workflow
 
 When `.pi/WORKFLOW.md` exists and the accepted plan selects phase-gated work, that file owns role
-topology, phase gates, review, convergence, continuation, and closure. Use `.pi/skills/phase-gate/`
-and `.pi/skills/handoff/` when those operations apply.
+topology, phase gates, review, convergence, continuation, and closure. Use
+`.pi/skills/pi-phase-gate/` and `.pi/skills/pi-handoff/` when those operations apply.
 
 If no project workflow applies, use the simplest single-agent execution path that satisfies the
 request and these global rules.
@@ -90,7 +90,8 @@ request and these global rules.
 ## 12. Skills
 
 Pi project workflow skills live under `.pi/skills/`; global Pi skills live under
-`~/.pi/agent/skills/`. Pi may also discover compatible `.agents/skills/` locations.
+`~/.pi/agent/skills/`. Pi may also discover compatible `.agents/skills/` locations. Harness-specific
+workflow skill names are namespaced so several harness packages can coexist in one project.
 
 Use the smallest applicable skill set. Read a relevant skill before acting. Do not stack unrelated
 skills only because they are available.

@@ -187,7 +187,7 @@ review lineage.
 
 Pi context compaction, session age, or a long run is not by itself a handoff trigger. Re-ground first.
 
-Use `.pi/skills/handoff/SKILL.md` when a role can no longer recover its verified state reliably. A
+Use `.pi/skills/pi-handoff/SKILL.md` when a role can no longer recover its verified state reliably. A
 continuation remains the same phase and role lineage; it is not a new phase or review round.
 
 When a separate reviewer session needs continuation, continue that reviewer lineage when Pi supports

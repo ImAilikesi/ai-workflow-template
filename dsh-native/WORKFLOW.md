@@ -183,7 +183,7 @@ review lineage.
 
 Compaction, session age, or a long run is not by itself a handoff trigger. Re-ground first.
 
-Use `.dsh/skills/handoff/SKILL.md` when a role can no longer recover its current state reliably. A
+Use `.dsh/skills/dsh-handoff/SKILL.md` when a role can no longer recover its current state reliably. A
 continuation remains the same phase and role lineage; it is not a new phase or review round.
 
 ## 10. Child handling

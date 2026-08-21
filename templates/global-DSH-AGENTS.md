@@ -83,8 +83,8 @@ Do not hide the difference.
 ## 11. Workflow
 
 When `.dsh/WORKFLOW.md` exists and the accepted plan selects phase-gated work, that file owns role
-topology, phase gates, review, convergence, continuation, and closure. Use `.dsh/skills/phase-gate/`
-and `.dsh/skills/handoff/` when those operations apply.
+topology, phase gates, review, convergence, continuation, and closure. Use
+`.dsh/skills/dsh-phase-gate/` and `.dsh/skills/dsh-handoff/` when those operations apply.
 
 If no project workflow applies, use the simplest single-agent execution path that satisfies the
 request and these global rules.
@@ -92,7 +92,8 @@ request and these global rules.
 ## 12. Skills
 
 DSH project workflow skills live under `.dsh/skills/`; global DSH skills live under
-`~/.dsh/skills/`. DSH may also discover compatible `.agents/skills/` locations.
+`~/.dsh/skills/`. DSH may also discover compatible `.agents/skills/` locations. Harness-specific
+workflow skill names are namespaced so several harness packages can coexist in one project.
 
 Use the smallest applicable skill set. Read a relevant skill before acting. Do not stack unrelated
 skills only because they are available.

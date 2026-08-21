@@ -1,5 +1,5 @@
 ---
-name: phase-gate
+name: pi-phase-gate
 description: Execute and close a Pi-native project phase using the repository's .pi/WORKFLOW.md.
 ---
 
@@ -77,4 +77,4 @@ verdict. The packet is a locator and state transfer, not a substitute for reposi
 ## Context
 
 Compaction count is not a handoff boundary. If the active role cannot recover its verified state
-reliably, invoke the `handoff` skill at a safe checkpoint.
+reliably, invoke the `pi-handoff` skill at a safe checkpoint.

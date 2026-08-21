@@ -1,5 +1,5 @@
 ---
-name: phase-gate
+name: cursor-phase-gate
 description: Execute and close a Cursor-native project phase using the repository's .cursor/WORKFLOW.md.
 ---
 
@@ -76,4 +76,4 @@ remediation delta, affected consumers, and necessary regression gates.
 ## Context
 
 Compaction count is not a handoff boundary. If the active role cannot recover its verified state
-reliably, invoke the `handoff` skill at a safe checkpoint.
+reliably, invoke the `cursor-handoff` skill at a safe checkpoint.

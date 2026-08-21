@@ -1,9 +1,9 @@
 ---
-name: handoff
-description: Transfer a verified checkpoint to one continuation in the same Pi-native phase and role lineage.
+name: dsh-handoff
+description: Transfer a verified checkpoint to one continuation in the same DSH-native phase and role lineage.
 ---
 
-# Pi-native handoff
+# DSH-native handoff
 
 Use this skill only when the current role cannot reliably continue from its active context or when the
 operator explicitly requests a continuation. A handoff is context transfer, not a phase, review, or
@@ -33,15 +33,16 @@ findings, resolved findings, current round, and exact targeted recheck scope.
 ## Transfer
 
 - Create or request exactly one successor in the same phase and role lineage.
-- Use the same model as the predecessor by default. No shipped Pi workflow file pins a model.
-- Label it `<Phase> · Pi · <Role> · C<N>`; add the actual model only when useful evidence.
+- Keep the same provider/model as the current role unless the operator or accepted contract explicitly
+  changes it. No shipped DSH workflow file pins a model.
+- Label it `<Phase> · DSH · <Role> · C<N>`; add the actual model only when useful evidence.
 - The predecessor stops after the verified checkpoint and packet.
-- The successor reads the packet, project `AGENTS.md`, `.pi/WORKFLOW.md`, and the live repository
-  before starting the named next action.
+- The successor reads the packet first, verifies the live tree or candidate, then starts the named
+  next action.
 - Do not replay the full transcript or broad memory.
 
-If successor creation is ambiguous, reconcile the existing session or extension-child state before
-creating anything else. Never create a second successor as a retry guess.
+If successor creation is ambiguous, reconcile the existing child/session state before creating
+anything else. Never create a second successor as a retry guess.
 
 A continuation does not reset readiness, review count, convergence state, phase authority, or
 candidate history.

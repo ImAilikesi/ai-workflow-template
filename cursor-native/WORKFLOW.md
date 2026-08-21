@@ -186,5 +186,6 @@ logical review lineage.
 Context compaction, conversation age, or a long run is not by itself a handoff trigger. Re-ground
 first.
 
-Use `.cursor/skills/handoff/SKILL.md` when a role can no longer recover its verified state reliably.
-A continuation remains the same phase and role lineage; it is not a new phase or review round.
+Use `.cursor/skills/cursor-handoff/SKILL.md` when a role can no longer recover its verified state
+reliably. A continuation remains the same phase and role lineage; it is not a new phase or review
+round.

@@ -29,8 +29,8 @@ overrides these when more specific.
 ## Cursor workflow
 
 When `.cursor/WORKFLOW.md` exists and the accepted plan selects phase-gated work, that file owns role
-topology, phase gates, review, convergence, continuation, and closure. Use `.cursor/skills/phase-gate/`
-and `.cursor/skills/handoff/` when those operations apply.
+topology, phase gates, review, convergence, continuation, and closure. Use
+`.cursor/skills/cursor-phase-gate/` and `.cursor/skills/cursor-handoff/` when those operations apply.
 
 Cursor project instructions come from the shared root `AGENTS.md`. Do not create a second project
 policy in `.cursor/rules/` that duplicates it.
@@ -48,8 +48,9 @@ request and these rules.
 ## Skills and engineering
 
 Cursor workflow skills live under `.cursor/skills/`. Cursor may also discover compatible
-`.agents/skills/`, Claude, or Codex skill locations, but use the smallest applicable skill set and do
-not load duplicate workflow skills from multiple roots.
+`.agents/skills/`, Claude, or Codex skill locations. Harness-specific workflow skill names are
+namespaced to avoid duplicate skill identities when several harness packages coexist in one project.
+Use the smallest applicable skill set and do not load duplicate copies of the same skill.
 
 Prefer simple, incremental, modular changes over speculative architecture. Check existing
 dependencies, documentation, and interfaces before adding packages or replacing mechanisms. Tests

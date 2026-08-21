@@ -1,9 +1,9 @@
 ---
-name: handoff
-description: Transfer a verified checkpoint to one continuation in the same Cursor-native phase and role lineage.
+name: pi-handoff
+description: Transfer a verified checkpoint to one continuation in the same Pi-native phase and role lineage.
 ---
 
-# Cursor-native handoff
+# Pi-native handoff
 
 Use this skill only when the current role cannot reliably continue from its active context or when the
 operator explicitly requests a continuation. A handoff is context transfer, not a phase, review, or
@@ -28,25 +28,25 @@ Keep the packet compact. Include:
 8. `NEXT ACTION`
 
 For a reviewer continuation, also preserve whether the review is INITIAL or RECHECK, material
-findings, resolved findings, current round, candidate identity, and exact targeted recheck scope.
+findings, resolved findings, current round, and exact targeted recheck scope.
 
 ## Transfer
 
 - Create or request exactly one successor in the same phase and role lineage.
-- Keep the active model by default. Shipped Cursor workflow subagents use `model: inherit`.
-- Label it `<Phase> · Cursor · <Role> · C<N>`; add the actual model only when useful evidence.
+- Use the same model as the predecessor by default. No shipped Pi workflow file pins a model.
+- Label it `<Phase> · Pi · <Role> · C<N>`; add the actual model only when useful evidence.
 - The predecessor stops after the verified checkpoint and packet.
-- The successor reads the packet, project `AGENTS.md`, `.cursor/WORKFLOW.md`, and the live repository
+- The successor reads the packet, project `AGENTS.md`, `.pi/WORKFLOW.md`, and the live repository
   before starting the named next action.
 - Do not replay the full transcript or broad memory.
 
-If successor creation is ambiguous, reconcile existing conversation/subagent state before creating
-anything else. Never create a second successor as a retry guess.
+If successor creation is ambiguous, reconcile the existing session or extension-child state before
+creating anything else. Never create a second successor as a retry guess.
 
 A continuation does not reset readiness, review count, convergence state, phase authority, or
 candidate history.
 
 ## Context rule
 
-Compaction or conversation age alone does not require this skill. Use it when the current state cannot
-be recovered confidently without broad history reconstruction.
+Compaction or session age alone does not require this skill. Use it when the current state cannot be
+recovered confidently without broad history reconstruction.

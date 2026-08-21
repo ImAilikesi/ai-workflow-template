@@ -1,5 +1,5 @@
 ---
-name: phase-gate
+name: dsh-phase-gate
 description: Execute and close a DSH-native project phase using the repository's .dsh/WORKFLOW.md.
 ---
 
@@ -83,4 +83,4 @@ Never run a fresh full reviewer for every remediation round.
 ## Context
 
 Compaction count is not a handoff boundary. If the active role cannot recover its verified state
-reliably, invoke the `handoff` skill at a safe checkpoint.
+reliably, invoke the `dsh-handoff` skill at a safe checkpoint.
