@@ -51,9 +51,9 @@ async function scanVerdicts(client, sessionID) {
       if (TERRA_VERDICT_RE.test(text)) {
         terraPass = true;
       }
-      // Strip terra markers first so a terra-only recording cannot satisfy the
-      // independent-review gate.
-      const withoutTerra = text.replace(TERRA_VERDICT_RE, "");
+      // Strip every terra marker first so no surviving terra recording can
+      // satisfy the independent-review gate.
+      const withoutTerra = text.replace(new RegExp(TERRA_VERDICT_RE.source, "g"), "");
       if (CHILD_VERDICT_RE.test(withoutTerra)) {
         childPass = true;
       }

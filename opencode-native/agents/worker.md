@@ -21,10 +21,13 @@ permission:
     "gh pr *": deny
     "gh release *": deny
     "wrangler deploy*": deny
+    "wrangler versions upload*": deny
     "cf:deploy*": deny
     "vercel*": deny
     "netlify deploy*": deny
+    "netlify prod*": deny
     "fly deploy*": deny
+    "flyctl deploy*": deny
 ---
 
 You are a bounded write worker inside an active workflow.
