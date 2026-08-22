@@ -1,5 +1,6 @@
 .DS_Store
 .lcm/
+.opencode/
 .env
 .env.*
 .runtime/gates/

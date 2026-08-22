@@ -1,69 +1,64 @@
-// Landing gate: mechanically block irreversible landing commands until the
-// required verdicts exist in the current session transcript.
+// Landing gate hook: mechanically block irreversible landing commands until
+// the matching verdicts exist in the project verdict ledger.
 //
-//   git commit                      -> needs  VERDICT: PASS        (independent review)
-//   git push / gh pr / deploys      -> needs  TERRA VERDICT: PASS  (cross-model terra review)
+//   git commit                 -> needs  VERDICT: PASS        (independent review)
+//   git push / pr / deploys    -> needs  TERRA VERDICT: PASS  (cross-model terra review)
 //
-// Disable entirely with OPENCODE_LANDING_GATE=off.
+// Ledger: .opencode/verdicts.log in the project directory (override with
+// OPENCODE_VERDICT_LEDGER). The phase-gate and terra-review skills append
+// every final verdict line there. Disable with OPENCODE_LANDING_GATE=off.
+
+import { readFile } from "node:fs/promises";
+import path from "node:path";
 
 const COMMIT_RE = /\bgit\s+commit\b/;
 const PUSH_RE =
   /\bgit\s+push\b|\bgh\s+pr\s+(create|merge)\b|\bgh\s+release\s+(create|upload|edit)\b|\bwrangler\s+(deploy|versions\s+upload)\b|\bcf:deploy\b|\bvercel\s+(deploy|--prod)\b|\bnetlify\s+(deploy|prod)\b|\bfly(?:ctl)?\s+deploy\b/;
 
-// A real verdict carries an em-dash/hyphen reason after PASS. This rejects the
-// documented template forms ("VERDICT: PASS|CHANGES|BLOCK") that instruction
-// files contain, so reading workflow docs never satisfies the gate.
-const CHILD_VERDICT_RE = /VERDICT:\s*PASS\s*[—-]\s*\S/;
-const TERRA_VERDICT_RE = /TERRA VERDICT:\s*PASS\s*[—-]\s*\S/;
-
-function extractText(part) {
-  if (!part || typeof part !== "object") return "";
-  if (part.type === "text" && typeof part.text === "string") return part.text;
-  if (
-    part.type === "tool" &&
-    part.state &&
-    part.state.status === "completed" &&
-    typeof part.state.output === "string"
-  ) {
-    return part.state.output;
+// A real verdict carries a concrete reason after PASS. Alternation templates
+// ("VERDICT: PASS|CHANGES|BLOCK"), bracket placeholders ("PASS — <reason>"),
+// and bare "PASS" never count, so instruction text cannot satisfy the gate.
+function passWithReason(matches) {
+  for (const match of matches) {
+    const rest = match[1];
+    if (/^\s*\|/.test(rest)) continue;
+    const separated = rest.match(/^\s*[—–-]\s*(.*)$/);
+    if (!separated) continue;
+    const reason = separated[1].trim();
+    if (!reason || /^[<[\{]/.test(reason)) continue;
+    return true;
   }
-  return "";
+  return false;
 }
 
-async function scanVerdicts(client, sessionID) {
-  let data;
+function hasTerraVerdictPass(text) {
+  return passWithReason(text.matchAll(/TERRA VERDICT:\s*PASS([^\n]*)/gi));
+}
+
+function hasChildVerdictPass(text) {
+  // Strip terra lines first so a terra recording never satisfies review.
+  const withoutTerra = text.replace(/TERRA VERDICT:[^\n]*/gi, "");
+  return passWithReason(withoutTerra.matchAll(/VERDICT:\s*PASS([^\n]*)/g));
+}
+
+async function scanLedger(ledgerPath) {
+  let text = "";
   try {
-    const res = await client.session.messages({ sessionID });
-    data = res.data;
-  } catch (err) {
-    throw new Error(
-      `Landing gate: could not read the session transcript (${err?.message ?? err}). ` +
-        `Retry, or start opencode with OPENCODE_LANDING_GATE=off to disable the gate.`,
-    );
+    text = await readFile(ledgerPath, "utf8");
+  } catch {
+    // Missing or unreadable ledger means no verdicts yet: stay blocked.
   }
-
-  let childPass = false;
-  let terraPass = false;
-  for (const entry of data ?? []) {
-    for (const part of entry?.parts ?? []) {
-      const text = extractText(part);
-      if (!text) continue;
-      if (TERRA_VERDICT_RE.test(text)) {
-        terraPass = true;
-      }
-      // Strip every terra marker first so no surviving terra recording can
-      // satisfy the independent-review gate.
-      const withoutTerra = text.replace(new RegExp(TERRA_VERDICT_RE.source, "g"), "");
-      if (CHILD_VERDICT_RE.test(withoutTerra)) {
-        childPass = true;
-      }
-    }
-  }
-  return { childPass, terraPass };
+  return {
+    childPass: hasChildVerdictPass(text),
+    terraPass: hasTerraVerdictPass(text),
+  };
 }
 
-export const LandingGate = async ({ client }) => {
+export const LandingGate = async ({ directory }) => {
   if (process.env.OPENCODE_LANDING_GATE === "off") return {};
+
+  const ledgerPath =
+    process.env.OPENCODE_VERDICT_LEDGER ?? path.join(directory ?? process.cwd(), ".opencode", "verdicts.log");
 
   return {
     "tool.execute.before": async (input, output) => {
@@ -73,20 +68,20 @@ export const LandingGate = async ({ client }) => {
       const needsTerraGate = PUSH_RE.test(command);
       if (!needsCommitGate && !needsTerraGate) return;
 
-      const { childPass, terraPass } = await scanVerdicts(client, input.sessionID);
+      const { childPass, terraPass } = await scanLedger(ledgerPath);
 
       if (needsCommitGate && !childPass) {
         throw new Error(
-          "Landing gate blocked `git commit`: no independent-review verdict exists in this session yet. " +
-            "Delegate @reviewer over the finished scope and resolve CHANGES findings until it ends with " +
-            "`VERDICT: PASS — <reason>`, then commit.",
+          "Landing gate blocked `git commit`: no independent-review verdict in the ledger. " +
+            "Delegate @reviewer over the finished scope, resolve CHANGES until `VERDICT: PASS`, " +
+            "and append the exact verdict line to .opencode/verdicts.log.",
         );
       }
       if (needsTerraGate && !terraPass) {
         throw new Error(
-          "Landing gate blocked a push/publish/deploy command: no cross-model terra verdict exists in this session yet. " +
-            "Run the terra-review skill (codex exec, read-only sandbox) over the landing evidence and iterate until it records " +
-            "`TERRA VERDICT: PASS — <reason>` in this session, then retry.",
+          "Landing gate blocked a push/publish/deploy command: no terra verdict in the ledger. " +
+            "Run the terra-review skill (codex exec --sandbox read-only), iterate until `TERRA VERDICT: PASS`, " +
+            "and append the exact verdict line to .opencode/verdicts.log.",
         );
       }
     },

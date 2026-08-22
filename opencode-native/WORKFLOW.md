@@ -48,8 +48,8 @@ each other.
 - `worker`: allow edits inside the slice; deny commit, push, branch moves, deploys, and delegation.
 - `reviewer`: deny edit, bash except read-only git inspection, and nested delegation.
 - No subagent commits, pushes, deploys, uses secrets, or takes destructive or external actions.
-- The landing gate applies to every session in this OpenCode process, including subagent sessions,
-  so a landing command from any lane stays mechanically blocked until the matching verdicts exist.
+- The landing gate applies to every bash session in this OpenCode process, so a landing command from
+  any lane stays mechanically blocked until the matching verdict lines exist in the project ledger.
 
 ### Review lineage
 
@@ -78,8 +78,8 @@ A fresh child session is not permission to run another full R1.
 10. Use `BLOCK` only for the narrow conditions in the review contract below.
 
 A review result never authorizes commit, push, deploy, spend, secrets, destructive actions, or other
-external changes. The landing gate plugin mechanically blocks those commands until the matching
-verdicts exist in the session transcript.
+external changes. The landing gate hook mechanically blocks those commands until the matching
+verdict lines exist in the project ledger `.opencode/verdicts.log`.
 
 ## 4. Candidate
 

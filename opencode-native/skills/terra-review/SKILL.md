@@ -34,7 +34,10 @@ sandbox. Terra reviews evidence; it never edits the tree.
 
 3. Read the full terra output. Classify each finding: confirmed defect, speculative concern, or
    out-of-scope note.
-4. Record the verdict verbatim in this session so the landing gate can see it:
+4. Record the verdict verbatim in this session and append the exact line to
+   `.opencode/verdicts.log`
+   (`mkdir -p .opencode && printf '%s\n' "<verdict line>" >> .opencode/verdicts.log`). The landing
+   gate reads only this ledger, so a terra verdict that is not appended unlocks nothing:
 
    `TERRA VERDICT: PASS|CHANGES|BLOCK — <one-line reason>`
 

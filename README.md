@@ -471,8 +471,8 @@ These rules are common across packages even though each harness expresses them i
   primary agent's model and reasoning effort.
 - Command Code workflow files do not pin a provider/model and keep model choice at session/user scope.
 
-The landing gate plugin gives OpenCode one mechanical exception: irreversible landing commands stay
-blocked until the matching verdicts exist in the session transcript.
+The landing gate hook gives OpenCode one mechanical exception: irreversible landing commands stay
+blocked until the matching verdict lines exist in the project ledger `.opencode/verdicts.log`.
 
 ## Uninstall
 
@@ -513,11 +513,13 @@ Restore any global instruction files or Cursor User Rules from the backups you m
   role prompt as the authority boundary.
 - **OpenCode subagent inheritance depends on leaving `model` unset.** Adding a `model` or `variant`
   field to a workflow subagent changes that contract.
-- **The landing gate reads the session transcript.** It blocks landing commands by verdict markers,
-  not by identity checks; a verdict pasted into the session counts. Marker matching requires a reason
-  after `PASS`, so instruction files that document the verdict forms do not satisfy it. The gate also
-  holds inside subagent sessions, whose transcripts contain no verdicts of their own. Disable it only
-  deliberately.
+- **The landing gate reads only the verdict ledger.** It blocks landing commands until matching
+  markers exist in `.opencode/verdicts.log` (override with `OPENCODE_VERDICT_LEDGER`). The
+  phase-gate and terra-review skills append every final verdict line to that file. Marker matching
+  requires a concrete reason after `PASS`; alternation templates and bracket placeholders such as
+  `VERDICT: PASS — <reason>` do not satisfy it. The gate matches raw command text, so writing about
+  landing commands (tests, docs, heredocs) can trip it falsely; produce such content with file
+  tools, or restart deliberately with `OPENCODE_LANDING_GATE=off`.
 - **Manual install with no versioning.** Copies can drift from this source; there is no update command.
 - **Overhead is real.** The full phase lifecycle is for consequential changes. Small work should stay
   single-agent.
