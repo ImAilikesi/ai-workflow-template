@@ -24,7 +24,7 @@ No test, build, or lint tooling. Verification is structural — see Local Rules.
 - `cursor-native/` — Cursor-orchestrated variant: `WORKFLOW.md`, namespaced `skills/`, `agents/`.
 - `pi-native/` — Pi-orchestrated variant: `WORKFLOW.md`, namespaced `skills/`.
 - `commandcode-native/` — Command Code-orchestrated variant: `WORKFLOW.md`, namespaced `skills/`, `agents/`.
-- `opencode-native/` — OpenCode-orchestrated variant: `WORKFLOW.md`, namespaced `skills/`, `agents/`.
+- `opencode-native/` — OpenCode-orchestrated variant: `WORKFLOW.md`, namespaced `skills/`, `agents/`, `plugins/`.
 - `templates/` — harness-specific global instructions plus shared project `AGENTS.md` and Claude
   project `CLAUDE.md` templates.
 - `README.md` — the public entry point: what each file is and where it installs.

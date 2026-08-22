@@ -68,24 +68,38 @@ authority that project policy demands.
 ## 10. OpenCode Model and Delegation Policy
 
 Do not pin a provider or model unless the operator or accepted project contract explicitly requires
-one. OpenCode subagents inherit the invoking primary agent's model when their agent definition omits
-`model`; keep that inheritance as the default.
+one. OpenCode subagents inherit the invoking primary agent's model and reasoning when their
+definitions omit `model` and `variant`; keep that inheritance as the default.
 
 Use subagents only for meaningful isolation, independent review, specialized work, or useful parallel
-breadth. Research, readiness, and review subagents are read-only by authority. Deny edit, bash, and
-nested task delegation for shipped workflow reviewer roles.
+breadth. Researcher and reviewer subagents are read-only by authority; workers are bounded write
+lanes. Deny edit, bash, and nested task delegation for shipped workflow reviewer roles.
 
 Do not use a different model merely to seek a different review verdict.
 
 ## 11. Workflow
 
-When `.opencode/WORKFLOW.md` exists and the accepted plan selects phase-gated work, that file owns
-role topology, phase gates, review, convergence, continuation, and closure. Use
-`.opencode/skills/opencode-phase-gate/` and `.opencode/skills/opencode-handoff/` when those operations
-apply.
+When a project workflow file exists and the accepted plan selects phase-gated work, that file owns
+role topology, phase gates, review, convergence, continuation, and closure. Use the phase-gate and
+handoff skills when those operations apply.
 
-If no project workflow applies, use the simplest single-agent execution path that satisfies the
-request and these global rules.
+Default execution shape:
+
+- One primary agent owns orchestration and integration. Delegate bounded questions to `researcher`
+  and bounded write slices to `worker`; run lanes in parallel only when they are independent.
+- After writers stop, delegate review to `reviewer` and iterate `CHANGES` until it ends with
+  `VERDICT: PASS`. This applies to ordinary changes too, not only formal phases.
+- At phase boundaries, whenever money, security, release, data integrity, or major architecture
+  changed, and before any push, publish, merge, or deploy, run the `terra-review` skill until it
+  records `TERRA VERDICT: PASS`.
+- The landing gate plugin blocks `git commit` without an independent-review `PASS` and blocks push,
+  publish, merge, release, and deploy commands without a terra `PASS`. Disable it only deliberately
+  with `OPENCODE_LANDING_GATE=off`.
+
+Do not reference specific models in instructions or configs; children inherit the invoking primary
+agent's model and reasoning. The only pinned model surface is the terra CLI override.
+
+If no project workflow applies, use this shape at the smallest useful scale.
 
 ## 12. Skills and Agents
 

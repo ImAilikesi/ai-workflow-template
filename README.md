@@ -33,7 +33,7 @@ are isolated.
 | [cursor-native/](cursor-native/) | Cursor | Cursor parent plus custom inherited-model read-only subagents |
 | [pi-native/](pi-native/) | Pi | Pi owner plus same-model isolated review sessions; child extensions are optional |
 | [commandcode-native/](commandcode-native/) | Command Code | Command Code parent plus custom read-only agents and native skills |
-| [opencode-native/](opencode-native/) | OpenCode | OpenCode primary agent plus inherited-model read-only subagents |
+| [opencode-native/](opencode-native/) | OpenCode | OpenCode primary owner plus researcher/worker/reviewer subagents, terra review, and the landing gate plugin |
 
 All seven implement the same abstract lifecycle in harness-native terms:
 
@@ -150,12 +150,19 @@ The normative contract is [`commandcode-native/WORKFLOW.md`](commandcode-native/
 
 ### OpenCode-native
 
-OpenCode uses one primary agent as owner/executor plus project subagents for bounded research,
-readiness, normal independent review, and critical independent review.
+OpenCode uses one primary agent as owner and orchestrator plus three subagent lanes: `researcher` for
+bounded read-only questions, `worker` for bounded write slices, and `reviewer` for read-only
+independent review that iterates `CHANGES` until `VERDICT: PASS`.
 
-The shipped OpenCode subagent files intentionally omit `model`. OpenCode therefore uses the model of
-the primary agent that invoked the subagent. Reviewer files deny edit, bash, and nested task
-delegation. Child sessions preserve isolation while the parent preserves one logical review lineage.
+The `terra-review` skill runs one cross-model pass through the Codex CLI in a read-only sandbox at
+phase boundaries and before any push, publish, merge, or deploy. The `landing-gate` plugin then makes
+the gate mechanical: it blocks `git commit` without an independent-review `PASS`, and blocks push,
+publish, merge, release, and deploy commands without a terra `PASS`. Disable it only deliberately
+with `OPENCODE_LANDING_GATE=off`.
+
+The shipped subagent files omit `model` and reasoning overrides. OpenCode therefore gives each child
+the model and reasoning effort of the primary agent that invoked it. Child sessions preserve
+isolation while the parent preserves one logical review lineage.
 
 The normative contract is [`opencode-native/WORKFLOW.md`](opencode-native/WORKFLOW.md).
 
@@ -181,8 +188,8 @@ lane. It is not part of the other harness workflows.
 
 Install only the products you actually use:
 
-- [Codex](https://developers.openai.com/codex) — `codex-native`, and independent review in
-  `claude-hybrid`.
+- [Codex](https://developers.openai.com/codex) — `codex-native`, independent review in
+  `claude-hybrid`, and terra review in `opencode-native`.
 - [Claude Code](https://claude.com/claude-code) — `claude-hybrid`.
 - [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) — `dsh-native`.
 - [Cursor](https://cursor.com/) — `cursor-native`.
@@ -248,11 +255,13 @@ opencode-native/
   skills/
     opencode-phase-gate/
     opencode-handoff/
+    terra-review/
   agents/
-    workflow-research-worker.md
-    workflow-readiness-reviewer.md
-    workflow-independent-reviewer.md
-    workflow-critical-reviewer.md
+    researcher.md
+    worker.md
+    reviewer.md
+  plugins/
+    landing-gate.js
 
 templates/
   global-CLAUDE.md
@@ -392,9 +401,16 @@ memory file.
 | `opencode-native/WORKFLOW.md` | `<project>/.opencode/WORKFLOW.md` |
 | `opencode-native/skills/` | `<project>/.opencode/skills/` |
 | `opencode-native/agents/` | `<project>/.opencode/agents/` |
+| `opencode-native/plugins/` | `<project>/.opencode/plugins/` |
 
 OpenCode reads the shared root `<project>/AGENTS.md`. Because it also discovers compatibility skill
-roots such as `.agents/skills/`, keep the OpenCode workflow skill names namespaced.
+roots such as `.agents/skills/`, keep the OpenCode workflow skill names namespaced. The landing gate
+plugin needs the Codex CLI on `PATH`; without it, only terra review fails, and the gate still holds
+push and deploy commands.
+
+Terra review uses the model from `OPENCODE_TERRA_MODEL`, defaulting to the pinned terra model. That
+override is the only model reference in the package; every subagent inherits the invoking primary
+agent's model and reasoning.
 
 ## Using it
 
@@ -451,9 +467,12 @@ These rules are common across packages even though each harness expresses them i
 - Model choice does not change authority.
 - DSH and Pi do not silently switch models for workflow roles.
 - Cursor custom workflow subagents use `model: inherit`.
-- OpenCode workflow subagents omit `model`, which makes them inherit the invoking primary agent's
-  model.
+- OpenCode workflow subagents omit `model` and `variant`, which makes them inherit the invoking
+  primary agent's model and reasoning effort.
 - Command Code workflow files do not pin a provider/model and keep model choice at session/user scope.
+
+The landing gate plugin gives OpenCode one mechanical exception: irreversible landing commands stay
+blocked until the matching verdicts exist in the session transcript.
 
 ## Uninstall
 
@@ -467,7 +486,7 @@ rm -rf <project>/.dsh/WORKFLOW.md <project>/.dsh/skills
 rm -rf <project>/.cursor/WORKFLOW.md <project>/.cursor/skills <project>/.cursor/agents
 rm -rf <project>/.pi/WORKFLOW.md <project>/.pi/skills
 rm -rf <project>/.commandcode/WORKFLOW.md <project>/.commandcode/skills <project>/.commandcode/agents
-rm -rf <project>/.opencode/WORKFLOW.md <project>/.opencode/skills <project>/.opencode/agents
+rm -rf <project>/.opencode/WORKFLOW.md <project>/.opencode/skills <project>/.opencode/agents <project>/.opencode/plugins
 
 # Codex global role presets
 rm -f ~/.codex/agents/{luna_executor,luna_research_worker,independent_reviewer,critical_reviewer,sol_advisor,volume_worker,pre_terra_readiness_reviewer}.toml
@@ -492,8 +511,10 @@ Restore any global instruction files or Cursor User Rules from the backups you m
 - **Pi base workflow is session-based.** It does not install or require a subagent extension.
 - **Command Code agent permissions use explicit read-only tool lists.** The workflow still treats the
   role prompt as the authority boundary.
-- **OpenCode subagent inheritance depends on leaving `model` unset.** Adding a model field to a
-  workflow reviewer changes that contract.
+- **OpenCode subagent inheritance depends on leaving `model` unset.** Adding a `model` or `variant`
+  field to a workflow subagent changes that contract.
+- **The landing gate reads the session transcript.** It blocks landing commands by verdict markers,
+  not by identity checks; a verdict pasted into the session counts. Disable it only deliberately.
 - **Manual install with no versioning.** Copies can drift from this source; there is no update command.
 - **Overhead is real.** The full phase lifecycle is for consequential changes. Small work should stay
   single-agent.
