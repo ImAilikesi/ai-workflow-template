@@ -10,6 +10,12 @@ const COMMIT_RE = /\bgit\s+commit\b/;
 const PUSH_RE =
   /\bgit\s+push\b|\bgh\s+pr\s+(create|merge)\b|\bgh\s+release\s+(create|upload|edit)\b|\bwrangler\s+(deploy|versions\s+upload)\b|\bcf:deploy\b|\bvercel\s+(deploy|--prod)\b|\bnetlify\s+(deploy|prod)\b|\bfly(?:ctl)?\s+deploy\b/;
 
+// A real verdict carries an em-dash/hyphen reason after PASS. This rejects the
+// documented template forms ("VERDICT: PASS|CHANGES|BLOCK") that instruction
+// files contain, so reading workflow docs never satisfies the gate.
+const CHILD_VERDICT_RE = /VERDICT:\s*PASS\s*[—-]\s*\S/;
+const TERRA_VERDICT_RE = /TERRA VERDICT:\s*PASS\s*[—-]\s*\S/;
+
 function extractText(part) {
   if (!part || typeof part !== "object") return "";
   if (part.type === "text" && typeof part.text === "string") return part.text;
@@ -42,9 +48,13 @@ async function scanVerdicts(client, sessionID) {
     for (const part of entry?.parts ?? []) {
       const text = extractText(part);
       if (!text) continue;
-      if (/TERRA VERDICT:\s*PASS\b/.test(text)) {
+      if (TERRA_VERDICT_RE.test(text)) {
         terraPass = true;
-      } else if (/VERDICT:\s*PASS\b/.test(text)) {
+      }
+      // Strip terra markers first so a terra-only recording cannot satisfy the
+      // independent-review gate.
+      const withoutTerra = text.replace(TERRA_VERDICT_RE, "");
+      if (CHILD_VERDICT_RE.test(withoutTerra)) {
         childPass = true;
       }
     }
@@ -65,7 +75,7 @@ export const LandingGate = async ({ client }) => {
 
       const { childPass, terraPass } = await scanVerdicts(client, input.sessionID);
 
-      if (needsCommitGate && !childPass && !terraPass) {
+      if (needsCommitGate && !childPass) {
         throw new Error(
           "Landing gate blocked `git commit`: no independent-review verdict exists in this session yet. " +
             "Delegate @reviewer over the finished scope and resolve CHANGES findings until it ends with " +

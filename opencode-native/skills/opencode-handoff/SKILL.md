@@ -39,5 +39,5 @@ resolved findings, candidate identity, and exact targeted recheck scope.
 - The successor reads the packet first, verifies live state, then performs the named next action.
 - Do not replay the full transcript or broad memory.
 
-A continuation does not reset readiness, review count, convergence state, phase authority, or candidate
+A continuation does not reset review state, convergence state, phase authority, or candidate
 history.

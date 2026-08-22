@@ -514,7 +514,10 @@ Restore any global instruction files or Cursor User Rules from the backups you m
 - **OpenCode subagent inheritance depends on leaving `model` unset.** Adding a `model` or `variant`
   field to a workflow subagent changes that contract.
 - **The landing gate reads the session transcript.** It blocks landing commands by verdict markers,
-  not by identity checks; a verdict pasted into the session counts. Disable it only deliberately.
+  not by identity checks; a verdict pasted into the session counts. Marker matching requires a reason
+  after `PASS`, so instruction files that document the verdict forms do not satisfy it. The gate also
+  holds inside subagent sessions, whose transcripts contain no verdicts of their own. Disable it only
+  deliberately.
 - **Manual install with no versioning.** Copies can drift from this source; there is no update command.
 - **Overhead is real.** The full phase lifecycle is for consequential changes. Small work should stay
   single-agent.

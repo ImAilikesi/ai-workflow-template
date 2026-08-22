@@ -22,6 +22,9 @@ permission:
     "gh release *": deny
     "wrangler deploy*": deny
     "cf:deploy*": deny
+    "vercel*": deny
+    "netlify deploy*": deny
+    "fly deploy*": deny
 ---
 
 You are a bounded write worker inside an active workflow.

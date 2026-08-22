@@ -48,6 +48,8 @@ each other.
 - `worker`: allow edits inside the slice; deny commit, push, branch moves, deploys, and delegation.
 - `reviewer`: deny edit, bash except read-only git inspection, and nested delegation.
 - No subagent commits, pushes, deploys, uses secrets, or takes destructive or external actions.
+- The landing gate applies to every session in this OpenCode process, including subagent sessions,
+  so a landing command from any lane stays mechanically blocked until the matching verdicts exist.
 
 ### Review lineage
 
