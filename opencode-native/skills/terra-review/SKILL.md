@@ -35,9 +35,10 @@ sandbox. Terra reviews evidence; it never edits the tree.
 3. Read the full terra output. Classify each finding: confirmed defect, speculative concern, or
    out-of-scope note.
 4. Record the verdict verbatim in this session and append the exact line to
-   `.opencode/verdicts.log`
-   (`mkdir -p .opencode && printf '%s\n' "<verdict line>" >> .opencode/verdicts.log`). The landing
-   gate reads only this ledger, so a terra verdict that is not appended unlocks nothing:
+   `.opencode/verdicts.log` with a file tool (create the file when missing; one line per verdict).
+   Never use a shell command for this: the landing gate matches raw command text, so a reason that
+   contains `git commit` or `git push` would block its own append. The landing gate reads only this
+   ledger, so a terra verdict that is not appended unlocks nothing:
 
    `TERRA VERDICT: PASS|CHANGES|BLOCK — <one-line reason>`
 

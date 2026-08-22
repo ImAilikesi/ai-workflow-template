@@ -33,9 +33,10 @@ project workflow file is authoritative for topology, review, convergence, and cl
    - Later rounds are targeted rechecks in the same logical lineage.
    - Iterate until the lineage ends with `VERDICT: PASS`.
    - After each reviewer verdict, record it verbatim in this session and append the exact line to
-     `.opencode/verdicts.log`
-     (`mkdir -p .opencode && printf '%s\n' "<verdict line>" >> .opencode/verdicts.log`). The landing
-     gate reads only this ledger, so a verdict that is not appended does not unlock anything.
+     `.opencode/verdicts.log` with a file tool (create the file when missing; one line per verdict).
+     Never use a shell command for this: the landing gate matches raw command text, so a reason that
+     contains `git commit` or `git push` would block its own append. The landing gate reads only
+     this ledger, so a verdict that is not appended does not unlock anything.
 
 5. **Remediate**
    - Fix accepted material findings in the owner lane.
