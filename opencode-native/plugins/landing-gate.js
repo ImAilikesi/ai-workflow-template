@@ -16,16 +16,25 @@ const PUSH_RE =
   /\bgit\s+push\b|\bgh\s+pr\s+(create|merge)\b|\bgh\s+release\s+(create|upload|edit)\b|\bwrangler\s+(deploy|versions\s+upload)\b|\bcf:deploy\b|\bvercel\s+(deploy|--prod)\b|\bnetlify\s+(deploy|prod)\b|\bfly(?:ctl)?\s+deploy\b/;
 
 // A real verdict carries a concrete reason after PASS. Alternation templates
-// ("VERDICT: PASS|CHANGES|BLOCK"), bracket placeholders ("PASS — <reason>"),
-// and bare "PASS" never count, so instruction text cannot satisfy the gate.
+// ("VERDICT: PASS|CHANGES|BLOCK"), bracket/paren placeholders ("PASS — <reason>",
+// "(reason)"), and quote-wrapped placeholders never count, so instruction text
+// cannot satisfy the gate.
 function passWithReason(matches) {
   for (const match of matches) {
     const rest = match[1];
     if (/^\s*\|/.test(rest)) continue;
     const separated = rest.match(/^\s*[—–-]\s*(.*)$/);
     if (!separated) continue;
-    const reason = separated[1].trim();
-    if (!reason || /^[<[\{]/.test(reason)) continue;
+    // Unwrap every layer of matching quotes before the placeholder check;
+    // anything still opening with a bracket, paren, or quote afterwards is a
+    // placeholder or malformed line, not a reason.
+    let reason = separated[1].trim();
+    for (;;) {
+      const next = reason.replace(/^(['"`])((?:(?!\1).)*)\1$/, "$2").trim();
+      if (next === reason) break;
+      reason = next;
+    }
+    if (!reason || /^[<[\{('"`]/.test(reason)) continue;
     return true;
   }
   return false;
