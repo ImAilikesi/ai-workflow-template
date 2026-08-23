@@ -405,20 +405,20 @@ memory file.
 | `opencode-native/WORKFLOW.md` | `<project>/.opencode/WORKFLOW.md` |
 | `opencode-native/skills/` | `<project>/.opencode/skills/` |
 | `opencode-native/agents/` | `<project>/.opencode/agents/` |
-| `opencode-native/plugins/` | `<project>/.opencode/plugins/` |
+| `opencode-native/plugins/landing-gate.js` | `<project>/.opencode/plugins/landing-gate.js` (optional) |
 
 OpenCode reads the shared root `<project>/AGENTS.md`. Because it also discovers compatibility skill
 roots such as `.agents/skills/`, keep the OpenCode workflow skill names namespaced. The optional
 landing gate plugin needs the Codex CLI on `PATH`; without it, only terra review fails, and the gate
-still holds push and deploy commands.
+still holds push and deploy commands. Copy it only when you want mechanical landing enforcement.
 
 Terra review uses the model from `OPENCODE_TERRA_MODEL`, defaulting to the pinned terra model. That
 override is the only model reference in the package; every subagent inherits the invoking primary
 agent's model and reasoning.
 
-Consumer setup: add `.opencode/verdicts.log` to the consuming repository's `.gitignore` before first
-use. The ledger is runtime state; committing it would carry stale `PASS` records into later clones
-and open the gate without fresh review.
+Consumer setup (only with the optional landing gate installed): add `.opencode/verdicts.log` to the
+consuming repository's `.gitignore` before first use. The ledger is runtime state; committing it
+would carry stale `PASS` records into later clones and open the gate without fresh review.
 
 ## Using it
 
