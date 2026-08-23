@@ -412,6 +412,10 @@ Terra review uses the model from `OPENCODE_TERRA_MODEL`, defaulting to the pinne
 override is the only model reference in the package; every subagent inherits the invoking primary
 agent's model and reasoning.
 
+Consumer setup: add `.opencode/verdicts.log` to the consuming repository's `.gitignore` before first
+use. The ledger is runtime state; committing it would carry stale `PASS` records into later clones
+and open the gate without fresh review.
+
 ## Using it
 
 Invoke the workflow skill that belongs to the active harness:
