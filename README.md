@@ -155,10 +155,14 @@ bounded read-only questions, `worker` for bounded write slices, and `reviewer` f
 independent review that iterates `CHANGES` until `VERDICT: PASS`.
 
 The `terra-review` skill runs one cross-model pass through the Codex CLI in a read-only sandbox at
-phase boundaries and before any push, publish, merge, or deploy. The `landing-gate` plugin then makes
-the gate mechanical: it blocks `git commit` without an independent-review `PASS`, and blocks push,
-publish, merge, release, and deploy commands without a terra `PASS`. Disable it only deliberately
-with `OPENCODE_LANDING_GATE=off`.
+phase boundaries and before any push, publish, merge, or deploy. The optional `landing-gate` plugin
+adds mechanical enforcement when a project installs it: `git commit` stays blocked without an
+independent-review `PASS`, and push, publish, merge, release, and deploy commands stay blocked
+without a terra `PASS`. Verdict matching requires a concrete reason after `PASS`; the gate reads the
+project ledger `.opencode/verdicts.log` (override with `OPENCODE_VERDICT_LEDGER`), to which the
+phase-gate and terra-review skills append every final verdict line when installed. Without the
+plugin, verdict rules remain instruction-level. Disable an installed gate only deliberately with
+`OPENCODE_LANDING_GATE=off`.
 
 The shipped subagent files omit `model` and reasoning overrides. OpenCode therefore gives each child
 the model and reasoning effort of the primary agent that invoked it. Child sessions preserve
@@ -404,9 +408,9 @@ memory file.
 | `opencode-native/plugins/` | `<project>/.opencode/plugins/` |
 
 OpenCode reads the shared root `<project>/AGENTS.md`. Because it also discovers compatibility skill
-roots such as `.agents/skills/`, keep the OpenCode workflow skill names namespaced. The landing gate
-plugin needs the Codex CLI on `PATH`; without it, only terra review fails, and the gate still holds
-push and deploy commands.
+roots such as `.agents/skills/`, keep the OpenCode workflow skill names namespaced. The optional
+landing gate plugin needs the Codex CLI on `PATH`; without it, only terra review fails, and the gate
+still holds push and deploy commands.
 
 Terra review uses the model from `OPENCODE_TERRA_MODEL`, defaulting to the pinned terra model. That
 override is the only model reference in the package; every subagent inherits the invoking primary
@@ -475,8 +479,9 @@ These rules are common across packages even though each harness expresses them i
   primary agent's model and reasoning effort.
 - Command Code workflow files do not pin a provider/model and keep model choice at session/user scope.
 
-The landing gate hook gives OpenCode one mechanical exception: irreversible landing commands stay
-blocked until the matching verdict lines exist in the project ledger `.opencode/verdicts.log`.
+The optional landing gate hook gives OpenCode one mechanical exception: when a project installs it,
+irreversible landing commands stay blocked until the matching verdict lines exist in the project
+ledger `.opencode/verdicts.log`.
 
 ## Uninstall
 
@@ -517,13 +522,13 @@ Restore any global instruction files or Cursor User Rules from the backups you m
   role prompt as the authority boundary.
 - **OpenCode subagent inheritance depends on leaving `model` unset.** Adding a `model` or `variant`
   field to a workflow subagent changes that contract.
-- **The landing gate reads only the verdict ledger.** It blocks landing commands until matching
-  markers exist in `.opencode/verdicts.log` (override with `OPENCODE_VERDICT_LEDGER`). The
-  phase-gate and terra-review skills append every final verdict line to that file. Marker matching
-  requires a concrete reason after `PASS`; alternation templates and bracket placeholders such as
-  `VERDICT: PASS — <reason>` do not satisfy it. The gate matches raw command text, so writing about
-  landing commands (tests, docs, heredocs) can trip it falsely; produce such content with file
-  tools, or restart deliberately with `OPENCODE_LANDING_GATE=off`.
+- **The optional landing gate reads only the verdict ledger.** When installed, it blocks landing
+  commands until matching markers exist in `.opencode/verdicts.log` (override with
+  `OPENCODE_VERDICT_LEDGER`). The phase-gate and terra-review skills append every final verdict line
+  to that file. Marker matching requires a concrete reason after `PASS`; alternation templates and
+  bracket placeholders such as `VERDICT: PASS — <reason>` do not satisfy it. The gate matches raw
+  command text, so writing about landing commands (tests, docs, heredocs) can trip it falsely;
+  produce such content with file tools, or restart deliberately with `OPENCODE_LANDING_GATE=off`.
 - **Manual install with no versioning.** Copies can drift from this source; there is no update command.
 - **Overhead is real.** The full phase lifecycle is for consequential changes. Small work should stay
   single-agent.

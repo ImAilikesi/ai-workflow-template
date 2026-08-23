@@ -88,14 +88,12 @@ Default execution shape:
 - One primary agent owns orchestration and integration. Delegate bounded questions to `researcher`
   and bounded write slices to `worker`; run lanes in parallel only when they are independent.
 - After writers stop, delegate review to `reviewer` and iterate `CHANGES` until it ends with
-  `VERDICT: PASS`. This applies to ordinary changes too, not only formal phases.
+  `VERDICT: PASS`. This applies to ordinary changes too, not only formal phases. `git commit` is
+  authorized only after that `PASS` exists as evidence.
 - At phase boundaries, whenever money, security, release, data integrity, or major architecture
   changed, and before any push, publish, merge, release upload, or deploy, run the `terra-review`
-  skill until it records `TERRA VERDICT: PASS`.
-- The landing gate plugin blocks `git commit` without an independent-review `PASS` and blocks push,
-  publish, merge, release, and deploy commands without a terra `PASS`. Marker matching requires an
-  explicit reason after `PASS`, so instruction text alone never satisfies it. Disable it only
-  deliberately with `OPENCODE_LANDING_GATE=off`.
+  skill until it records `TERRA VERDICT: PASS`. Those landing commands are authorized only after
+  that `PASS` exists as evidence.
 
 Do not reference specific models in instructions or configs; children inherit the invoking primary
 agent's model and reasoning. The only pinned model surface is the terra CLI override.

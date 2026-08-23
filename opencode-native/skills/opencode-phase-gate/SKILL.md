@@ -32,11 +32,11 @@ project workflow file is authoritative for topology, review, convergence, and cl
      and cross-repository contracts as critical surfaces.
    - Later rounds are targeted rechecks in the same logical lineage.
    - Iterate until the lineage ends with `VERDICT: PASS`.
-   - After each reviewer verdict, record it verbatim in this session and append the exact line to
-     `.opencode/verdicts.log` with a file tool (create the file when missing; one line per verdict).
-     Never use a shell command for this: the landing gate matches raw command text, so a reason that
-     contains `git commit` or `git push` would block its own append. The landing gate reads only
-     this ledger, so a verdict that is not appended does not unlock anything.
+   - After each reviewer verdict, record it verbatim in this session. When the landing gate plugin
+     is installed, also append the exact line to the active verdict ledger (`.opencode/verdicts.log`
+     by default; `OPENCODE_VERDICT_LEDGER` overrides the path) with a file tool — create the file
+     when missing, one line per verdict, never a shell command: the gate matches raw command text,
+     so a reason containing `git commit` or `git push` would block its own append.
 
 5. **Remediate**
    - Fix accepted material findings in the owner lane.
@@ -57,7 +57,8 @@ project workflow file is authoritative for topology, review, convergence, and cl
    - Verify the reviewed candidate is still current and required gates remain satisfied.
    - Only the owner issues `CLOSE|REOPEN|BLOCK`.
    - Closure does not authorize commit, push, deploy, spend, secret use, destructive actions, or
-     external mutation. The landing gate enforces this mechanically.
+     external mutation; when the optional landing gate plugin is installed, it enforces this
+     mechanically.
 
 ## Context
 

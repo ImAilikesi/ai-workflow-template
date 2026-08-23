@@ -86,14 +86,16 @@ export const LandingGate = async ({ directory }) => {
         throw new Error(
           "Landing gate blocked `git commit`: no independent-review verdict in the ledger. " +
             "Delegate @reviewer over the finished scope, resolve CHANGES until `VERDICT: PASS`, " +
-            "and append the exact verdict line to .opencode/verdicts.log.",
+            "and append the exact verdict line to the active verdict ledger " +
+            "(.opencode/verdicts.log by default; OPENCODE_VERDICT_LEDGER overrides the path).",
         );
       }
       if (needsTerraGate && !terraPass) {
         throw new Error(
           "Landing gate blocked a push/publish/deploy command: no terra verdict in the ledger. " +
             "Run the terra-review skill (codex exec --sandbox read-only), iterate until `TERRA VERDICT: PASS`, " +
-            "and append the exact verdict line to .opencode/verdicts.log.",
+            "and append the exact verdict line to the active verdict ledger " +
+            "(.opencode/verdicts.log by default; OPENCODE_VERDICT_LEDGER overrides the path).",
         );
       }
     },

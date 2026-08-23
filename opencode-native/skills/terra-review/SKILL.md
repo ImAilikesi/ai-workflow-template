@@ -1,6 +1,6 @@
 ---
 name: terra-review
-description: Cross-model terra review through the Codex CLI. Use when a phase closes, when money/security/release/data-integrity/architecture surfaces changed, or before any push, publish, merge, or deploy. Runs a read-only second opinion and records TERRA VERDICT markers the landing gate requires.
+description: Cross-model terra review through the Codex CLI. Use when a phase closes, when money/security/release/data-integrity/architecture surfaces changed, or before any push, publish, merge, or deploy. Runs a read-only second opinion and records TERRA VERDICT markers; the optional landing gate plugin consumes them when installed.
 ---
 
 # Terra review
@@ -34,11 +34,11 @@ sandbox. Terra reviews evidence; it never edits the tree.
 
 3. Read the full terra output. Classify each finding: confirmed defect, speculative concern, or
    out-of-scope note.
-4. Record the verdict verbatim in this session and append the exact line to
-   `.opencode/verdicts.log` with a file tool (create the file when missing; one line per verdict).
-   Never use a shell command for this: the landing gate matches raw command text, so a reason that
-   contains `git commit` or `git push` would block its own append. The landing gate reads only this
-   ledger, so a terra verdict that is not appended unlocks nothing:
+4. Record the verdict verbatim in this session. When the landing gate plugin is installed, also
+   append the exact line to the active verdict ledger (`.opencode/verdicts.log` by default;
+   `OPENCODE_VERDICT_LEDGER` overrides the path) with a file tool — create the file when missing,
+   one line per verdict, never a shell command: the gate matches raw command text, so a reason
+   containing `git commit` or `git push` would block its own append:
 
    `TERRA VERDICT: PASS|CHANGES|BLOCK — <one-line reason>`
 
