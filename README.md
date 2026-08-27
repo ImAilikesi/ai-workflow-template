@@ -31,7 +31,8 @@ templates/                  # manual copy/paste project bundles
 inactive/                   # retained but not live or synced
 └── codex/
     ├── phase-gate/
-    └── handoff/
+    ├── handoff/
+    └── master-control-room-v1/
 
 sync.sh
 ```
@@ -141,7 +142,7 @@ The repository no longer ships its custom handoff or phase-gate skills as active
 
 - Cross-session transfer uses the globally managed `handoff` skill where available.
 - Useful phase-gate mechanics — bounded scope, verification, candidate freeze, independent review, targeted recheck, and final signoff — live directly in concise `WORKFLOW.md` files.
-- The retired custom skills are retained under `inactive/codex/` for future reference.
+- Retired custom phase-gate/handoff assets and the previous detailed MCR implementation are retained under `inactive/codex/` for future reference.
 
 ## Sync
 
