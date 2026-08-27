@@ -10,3 +10,4 @@ Current retained items:
 
 - `codex/phase-gate/SKILL.md` — retired custom phase-gate skill.
 - `codex/handoff/SKILL.md` — retired custom handoff skill, replaced by the globally managed handoff skill.
+- `codex/master-control-room-v1/` — previous detailed MCR skill and contract, retained as reference after the live MCR topology was simplified into Codex `WORKFLOW.md`.
