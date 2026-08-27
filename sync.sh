@@ -3,6 +3,7 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ACTION="${1:-status}"
+failed=0
 
 case "$ACTION" in
   status|apply|pull) ;;
@@ -16,16 +17,42 @@ roots=(
   "live/dsh|${DSH_HOME:-$HOME/.dsh}"
 )
 
+has_symlink_component() {
+  local path="$1"
+  local stop="$2"
+  local parent
+
+  while :; do
+    [[ -L "$path" ]] && return 0
+    [[ "$path" == "$stop" ]] && return 1
+    parent="$(dirname "$path")"
+    [[ "$parent" == "$path" ]] && return 1
+    path="$parent"
+  done
+}
+
 for mapping in "${roots[@]}"; do
   src_rel="${mapping%%|*}"
   dst_root="${mapping#*|}"
   src_root="$ROOT/$src_rel"
   [[ -d "$src_root" ]] || continue
 
+  if [[ "$dst_root" != /* ]]; then
+    printf 'REFUSE   non-absolute destination root: %s\n' "$dst_root" >&2
+    failed=1
+    continue
+  fi
+
   while IFS= read -r -d '' src; do
     rel="${src#$src_root/}"
     repo_rel="$src_rel/$rel"
     dst="$dst_root/$rel"
+
+    if has_symlink_component "$dst" "$dst_root"; then
+      printf 'REFUSE   symlink destination: %s\n' "$dst" >&2
+      failed=1
+      continue
+    fi
 
     case "$ACTION" in
       status)
@@ -53,3 +80,7 @@ for mapping in "${roots[@]}"; do
     esac
   done < <(find "$src_root" -type f -print0 | sort -z)
 done
+
+if (( failed != 0 )); then
+  exit 1
+fi
