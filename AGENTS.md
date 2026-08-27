@@ -6,6 +6,7 @@ This repository is a public-safe control room for editable AI harness instructio
 
 - `live/` mirrors the intended global state for harnesses actually configured on the machine.
 - `templates/` contains manual copy-ready project bundles.
+- `inactive/` retains curated non-live assets for possible future reuse.
 - `sync.sh` mirrors only tracked public-safe live files to normal harness locations.
 
 Skills are managed separately by Skills Manager. Do not add shared skill libraries here.
@@ -17,16 +18,27 @@ Skills are managed separately by Skills Manager. Do not add shared skill librari
 - `live/claude/` — global Claude instruction file.
 - `live/dsh/` — global DSH instruction file.
 - `templates/<harness>/` — complete manual project bundle for that harness.
+- `inactive/` — public-safe retained assets that are not live, not synced, and not normative.
 
 Do not add a harness under `live/` until its real local editable instruction surface is verified. Do not add symlinks or make harnesses read this repository at runtime.
 
 ## Workflow rules
 
-Codex has exactly three standard workflow topologies: Sol + GLM, Sol-only, and Sol + Luna. Existing configured Codex supporting roles remain available unless the operator explicitly authorizes deletion.
+Codex has exactly three standard workflow topologies:
 
-Other harness templates use one model-agnostic shape: active model owns orchestration and execution; the operator selects one independent reviewer model.
+1. **Native — default:** Sol parent -> Luna executor -> final Terra review -> same Sol final signoff.
+2. **Sol + GLM:** Sol parent -> GLM executor -> isolated GLM reviewer -> same Sol final signoff; Terra only for critical final audit.
+3. **Sol-only:** Sol owner/orchestrator/executor -> final Terra review -> same Sol final signoff.
 
-Do not restore separate phase-gate or handoff skill packages here. Keep the useful review/verification mechanics in concise `WORKFLOW.md` files. Cross-session handoff uses the globally managed `handoff` skill.
+A substantial Codex task uses one persistent Sol parent thread. Delegated executors, bounded helpers, and reviewers sit below that parent; do not create a peer Sol orchestrator beside its executor.
+
+`luna_research_worker` and `volume_worker` are the normal shared bounded helper roles. Other configured Codex roles remain available unless the operator explicitly authorizes deletion, but they are not mandatory workflow stages.
+
+MCR is optional project-level authority for genuinely multi-phase or multi-workstream projects. Keep it in a separate principal thread above phase parent threads; do not mix MCR state with ordinary executor/reviewer context.
+
+Other harness templates use one model-agnostic shape: one primary parent owns orchestration and execution; the operator selects one independent reviewer model.
+
+Do not restore separate live phase-gate or custom handoff skill packages here. Keep the useful review/verification mechanics in concise `WORKFLOW.md` files. Cross-session transfer uses the globally managed `handoff` skill where available. Retired custom skills may be retained under `inactive/`.
 
 ## Content preservation
 
