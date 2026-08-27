@@ -2,8 +2,8 @@
 
 Keep changes focused on the repository's two responsibilities:
 
-1. public-safe global harness instruction surfaces under `live/`;
-2. manual project starter files under `templates/project/`.
+1. public-safe global harness instruction/workflow surfaces under `live/`;
+2. manual copy-ready project bundles under `templates/<harness>/`.
 
 Shared skills belong in Skills Manager, not here.
 
@@ -12,6 +12,7 @@ Shared skills belong in Skills Manager, not here.
 - Updating a tracked live instruction, workflow, or hand-maintained role file.
 - Adding a verified editable global surface for a harness that is actually used.
 - Improving a manual project template.
+- Improving one of the three Codex workflows or the generic non-Codex workflow.
 - Fixing `sync.sh` behavior.
 - Improving documentation for the control-room structure.
 
@@ -21,7 +22,8 @@ Shared skills belong in Skills Manager, not here.
 - Generated Codex Router model files.
 - Symlink-based installs or runtime dependencies on this repository.
 - Shared skill libraries.
-- Reintroducing phase-gate/readiness/ledger machinery without a concrete failure that requires it.
+- Reintroducing separate phase-gate, handoff, ledger, or mandatory readiness packages without a concrete failure that requires them.
+- Deleting configured live role definitions without explicit operator authorization.
 - Infrastructure that does not directly help maintain these surfaces.
 
 ## Pull requests
