@@ -15,16 +15,17 @@ roots=(
   "live/opencode|$HOME/.config/opencode"
   "live/claude|$HOME/.claude"
   "live/dsh|${DSH_HOME:-$HOME/.dsh}"
+  "live/pi|$HOME/.pi/agent"
+  "live/omp|$HOME/.omp/agent"
+  "live/command-code|$HOME/.commandcode"
 )
 
 has_symlink_component() {
   local path="$1"
-  local stop="$2"
   local parent
 
   while :; do
     [[ -L "$path" ]] && return 0
-    [[ "$path" == "$stop" ]] && return 1
     parent="$(dirname "$path")"
     [[ "$parent" == "$path" ]] && return 1
     path="$parent"
@@ -48,7 +49,7 @@ for mapping in "${roots[@]}"; do
     repo_rel="$src_rel/$rel"
     dst="$dst_root/$rel"
 
-    if has_symlink_component "$dst" "$dst_root"; then
+    if has_symlink_component "$dst"; then
       printf 'REFUSE   symlink destination: %s\n' "$dst" >&2
       failed=1
       continue

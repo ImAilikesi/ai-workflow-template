@@ -16,8 +16,17 @@ live/                       # exact intended global live state
 │   └── agents/
 ├── claude/
 │   └── CLAUDE.md
-└── dsh/
-    └── AGENTS.md
+├── dsh/
+│   └── AGENTS.md
+├── pi/
+│   └── AGENTS.md
+├── omp/
+│   ├── AGENTS.md
+│   └── RULES.md
+└── command-code/
+    ├── AGENTS.md
+    └── agents/
+        └── independent-reviewer.md
 
 templates/                  # manual project instruction templates
 ├── project-AGENTS.md
@@ -37,6 +46,18 @@ sync.sh
 `live/` is the desired public-safe global configuration for harnesses actually configured on the current machine. `sync.sh` mirrors these files to their normal harness locations.
 
 Harnesses still read their normal global paths. There are no symlinks and no runtime dependency on this repository.
+
+Tracked global roots:
+
+- Codex: `~/.codex/`
+- OpenCode: `~/.config/opencode/`
+- Claude: `~/.claude/`
+- DSH: `${DSH_HOME:-~/.dsh}`
+- Pi: `~/.pi/agent/`
+- OMP: `~/.omp/agent/`
+- Command Code: `~/.commandcode/`
+
+Pi and OMP can relocate their agent directory with runtime/profile configuration. `sync.sh` intentionally targets the default native roots so two installed runtimes cannot silently collide through one shared override path.
 
 ### `templates/`
 
@@ -133,15 +154,18 @@ Bias toward continuity: reuse the same Sol parent, executor lineage, and reviewe
 
 ## Other harnesses
 
-Non-Codex harness workflows use one model-agnostic shape in their global configuration:
+OpenCode, DSH, Pi, OMP, Command Code, and Claude use the same lean principle: one active parent owns orchestration and execution, with independent review only when it materially helps or the operator selects it.
 
 ```text
 primary parent = owner + orchestrator + executor
-→ one operator-selected independent reviewer
-→ same parent final signoff
+→ optional independent read-only review
+→ same parent final verification/signoff
 ```
 
-The project templates do not pin the owner or reviewer model and do not install a harness workflow. If a harness cannot run the chosen reviewer model as a native child, use one isolated reviewer session instead.
+- Pi tracks only its native global `AGENTS.md`; no replacement `SYSTEM.md` is shipped.
+- OMP tracks native `AGENTS.md` plus a very small sticky `RULES.md`; its built-in reviewer is preferred over a duplicate custom reviewer.
+- Command Code tracks global `AGENTS.md` plus one read-only personal `independent-reviewer` agent.
+- Provider/account settings, model catalogs, credentials, MCP, prompts, hooks, extensions, and other runtime state stay outside this repository.
 
 The same configured-role restriction applies: no ad-hoc or unconfigured native subagents unless the operator explicitly overrides it.
 
