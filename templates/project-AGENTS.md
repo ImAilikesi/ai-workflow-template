@@ -1,5 +1,5 @@
 # Provider
-Shared project instructions for AGENTS.md-compatible harnesses: Codex, DSH, Cursor, Pi, Command Code,
+Shared project instructions for AGENTS.md-compatible harnesses: Codex, DSH, Cursor, Pi, OMP, Command Code,
 and OpenCode. This file contains project-specific rules only.
 
 # Project

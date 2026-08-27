@@ -15,6 +15,9 @@ roots=(
   "live/opencode|$HOME/.config/opencode"
   "live/claude|$HOME/.claude"
   "live/dsh|${DSH_HOME:-$HOME/.dsh}"
+  "live/pi|$HOME/.pi/agent"
+  "live/omp|$HOME/.omp/agent"
+  "live/command-code|$HOME/.commandcode"
 )
 
 has_symlink_component() {
