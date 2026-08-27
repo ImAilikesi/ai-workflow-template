@@ -1,9 +1,10 @@
 # Contributing
 
-Keep changes focused on the repository's two responsibilities:
+Keep changes focused on the repository's three responsibilities:
 
 1. public-safe global harness instruction/workflow surfaces under `live/`;
-2. manual copy-ready project bundles under `templates/<harness>/`.
+2. manual copy-ready project bundles under `templates/<harness>/`;
+3. curated non-live public-safe assets under `inactive/`.
 
 Shared skills belong in Skills Manager, not here.
 
@@ -13,6 +14,7 @@ Shared skills belong in Skills Manager, not here.
 - Adding a verified editable global surface for a harness that is actually used.
 - Improving a manual project template.
 - Improving one of the three Codex workflows or the generic non-Codex workflow.
+- Retaining a deliberately selected non-live asset under `inactive/`.
 - Fixing `sync.sh` behavior.
 - Improving documentation for the control-room structure.
 
@@ -22,7 +24,8 @@ Shared skills belong in Skills Manager, not here.
 - Generated Codex Router model files.
 - Symlink-based installs or runtime dependencies on this repository.
 - Shared skill libraries.
-- Reintroducing separate phase-gate, handoff, ledger, or mandatory readiness packages without a concrete failure that requires them.
+- Dumping broad historical trees into `inactive/`; Git history already stores history.
+- Reintroducing separate live phase-gate, handoff, ledger, or mandatory readiness packages without a concrete failure that requires them.
 - Deleting configured live role definitions without explicit operator authorization.
 - Infrastructure that does not directly help maintain these surfaces.
 
@@ -39,7 +42,8 @@ Before landing a change:
 - run `bash -n sync.sh` when the script changed;
 - parse changed TOML or other structured files;
 - confirm no secret/private value was added;
-- confirm project templates contain only portable placeholders.
+- confirm project templates contain only portable placeholders;
+- confirm `inactive/` content is not treated as current authority or synced by `sync.sh`.
 
 ## License
 
