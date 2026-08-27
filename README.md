@@ -1,11 +1,11 @@
 # AI Workflow Template
 
-A lean public-safe control room for AI coding-harness instructions and copy-ready project workflow templates.
+A lean public-safe control room for AI coding-harness instructions, workflows, and copy-ready project templates.
 
-## Structure
+## Architecture
 
 ```text
-live/
+live/                       # exact intended global live state
 ├── codex/
 │   ├── AGENTS.md
 │   ├── WORKFLOW.md
@@ -19,7 +19,7 @@ live/
 └── dsh/
     └── AGENTS.md
 
-templates/
+templates/                  # manual copy/paste project bundles
 ├── codex/
 ├── opencode/
 ├── claude/
@@ -27,38 +27,121 @@ templates/
 ├── pi/
 ├── command-code/
 └── cursor/
+
+inactive/                   # retained but not live or synced
+└── codex/
+    ├── phase-gate/
+    └── handoff/
+
+sync.sh
 ```
 
-`live/` is the intended global editable state for harnesses actually configured on the current machine. `sync.sh` mirrors those files to their normal harness locations. It does not use symlinks and it does not make any harness read this repository at runtime.
+### `live/`
 
-`templates/` contains complete project folders for manual copy/paste. Project templates are manual by design.
+`live/` is the desired public-safe global configuration for harnesses actually configured on the current machine. `sync.sh` mirrors these files to their normal harness locations.
 
-Skills are managed separately by Skills Manager. Credentials, provider/account configuration, generated router files, memories, caches, and private data do not belong here.
+Harnesses still read their normal global paths. There are no symlinks and no runtime dependency on this repository.
 
-## Codex workflows
+### `templates/`
 
-`live/codex/WORKFLOW.md` defines exactly three standard topologies:
+`templates/` contains complete project folders for manual copy/paste. Project installation stays manual by design.
 
-1. **Sol + GLM — default:** same Sol owner -> GLM executor -> isolated GLM reviewer -> same Sol final verification. Terra is added only for critical final audit.
-2. **Sol-only — hardest work:** same Sol owner/orchestrator/executor -> one final Terra review -> same Sol signoff.
-3. **Sol + Luna — conservative native path:** same Sol owner -> Luna executor -> one final Terra review -> same Sol signoff.
+Example:
 
-Existing Codex supporting roles remain available but are optional, not mandatory workflow stages.
+```bash
+cp -R templates/codex/. /path/to/project/
+```
+
+Then fill the bracketed project fields in `AGENTS.md` or `CLAUDE.md`.
+
+### `inactive/`
+
+`inactive/` is a curated standby library for public-safe configuration or workflow assets that are intentionally not used live but may be useful again. It is never synced and is never normative.
+
+Do not use it as a dump for old history. Git already stores history; keep only deliberately retained assets here.
+
+## Codex workflow
+
+`live/codex/WORKFLOW.md` defines exactly three standard topologies.
+
+### 1. Native — default
+
+```text
+Sol parent
+→ Luna executor
+→ final Terra review
+→ same Sol final verification
+```
+
+This is the default substantial-work workflow.
+
+### 2. Sol + GLM
+
+```text
+Sol parent
+→ GLM-5.3-Flash executor
+→ isolated GLM reviewer
+→ same Sol final verification
+```
+
+Terra is added only for a genuinely critical final audit.
+
+### 3. Sol-only
+
+```text
+Sol owner/orchestrator/executor
+→ final Terra review
+→ same Sol final verification
+```
+
+Use for the hardest or most consequential work where Sol should implement directly.
+
+### Shared bounded helpers
+
+Only two helpers are normal shared workflow tools:
+
+- `luna_research_worker` — bounded read-only research/question lane;
+- `volume_worker` — bounded disjoint implementation slice.
+
+Other configured Codex roles remain installed, but they are not mandatory stages in the three standard workflows.
+
+## Codex thread model
+
+A substantial task has one persistent Sol parent thread. Delegated executor and reviewer lineages sit below it; Sol is never spawned as a peer subagent beside the executor.
+
+```text
+optional MCR principal
+        ↓
+Sol phase parent
+   ├── primary executor
+   │   ├── bounded research
+   │   └── bounded volume work
+   └── independent reviewer
+```
+
+MCR is optional project-level authority for multi-phase/multi-workstream projects. It stays in its own long-lived principal thread and never carries ordinary executor/reviewer context.
+
+Bias toward continuity: reuse the same Sol parent, executor lineage, and reviewer lineage while they remain reliable. Do not rotate because of age, token count, compaction, or review-round count alone.
 
 ## Other harnesses
 
 Cursor, Command Code, Pi, DSH, Claude, and OpenCode project templates use one model-agnostic workflow:
 
-`active model = owner + orchestrator + executor -> operator-selected independent reviewer -> same owner final signoff`
+```text
+primary parent = owner + orchestrator + executor
+→ one operator-selected independent reviewer
+→ same parent final signoff
+```
 
-The operator chooses both models. The template does not pin a provider or reviewer model.
+The template does not pin the owner or reviewer model. If the harness cannot run the chosen reviewer model as a native child, use one isolated reviewer session instead.
 
 ## Handoff and phase gating
 
-The repository no longer ships its own handoff or phase-gate skills.
+The repository no longer ships its custom handoff or phase-gate skills as active configuration.
 
-- Cross-session handoff uses the globally managed `handoff` skill.
-- The useful phase-gate ideas — bounded scope, verification, candidate freeze, independent review, targeted recheck, and final signoff — live directly in the concise `WORKFLOW.md` files.
+- Cross-session transfer uses the globally managed `handoff` skill where available.
+- Useful phase-gate mechanics — bounded scope, verification, candidate freeze, independent review, targeted recheck, and final signoff — live directly in concise `WORKFLOW.md` files.
+- The retired custom skills are retained under `inactive/codex/` for future reference.
 
 ## Sync
 
@@ -72,20 +155,14 @@ The repository no longer ships its own handoff or phase-gate skills.
 - `apply` copies repository live state into normal global harness locations.
 - `pull` copies current global harness files back into `live/`.
 
-Review changes before `apply`. The script only handles tracked public-safe surfaces under `live/`.
+`sync.sh` only handles tracked files under `live/`. It never touches `templates/` or `inactive/`.
 
-## Project templates
+Review changes before `apply`.
 
-Copy one harness folder into a project root, preserving hidden directories. Example:
+## Scope boundary
 
-```bash
-cp -R templates/codex/. /path/to/project/
-```
+Skills are managed separately by Skills Manager. Credentials, provider/account configuration, generated router files, memories, caches, full machine configuration, and private project data do not belong here.
 
-Then fill the bracketed project fields in `AGENTS.md` or `CLAUDE.md`.
-
-## Public-safe boundary
-
-Do not commit API keys, tokens, `.env`, private project data, full provider configuration, account state, generated authenticated router files, memories, caches, or machine-specific secrets.
+Do not commit API keys, tokens, `.env`, private URLs, account state, generated authenticated router files, or machine-specific secrets.
 
 MIT licensed.
