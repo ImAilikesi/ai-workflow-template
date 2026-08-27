@@ -40,7 +40,7 @@ session age alone does not require a handoff. Re-ground from the tree, changed p
 active contract, and unresolved work before deciding context is stale.
 
 For an actual cross-session transfer, use the globally installed `handoff` skill when the operator
-invokes it. Do not maintain a separate workflow-specific handoff protocol.
+invokes it.
 
 ## 7. Communication
 
@@ -68,18 +68,25 @@ authority that project policy demands.
 ## 10. OpenCode Model and Delegation Policy
 
 Do not pin a provider or model unless the operator or accepted project contract explicitly requires
-one. The operator selects the active owner/executor model and, when review is required, the independent
-reviewer model.
+one. OpenCode subagents inherit the invoking primary agent's model and reasoning when their
+definitions omit `model` and `variant`; keep that inheritance as the default. The operator may
+explicitly select a different model for the independent reviewer.
 
 Use subagents only for meaningful isolation, independent review, specialized work, or useful parallel
 breadth. Researcher and reviewer subagents are read-only by authority; workers are bounded write
-lanes. Do not use additional roles merely because they are configured.
+lanes. Deny edit, bash, and nested task delegation for shipped workflow reviewer roles.
+
+Keep the operator-selected reviewer model fixed for that review lineage. Do not switch models merely
+to seek a different verdict.
 
 ## 11. Workflow
 
-When `.opencode/WORKFLOW.md` exists, it owns workflow mechanics. The default shape is one active model
-as owner, orchestrator, executor, integrator, and remediator, followed by one independent read-only
+When `.opencode/WORKFLOW.md` exists, it owns workflow mechanics. Use one active model as owner,
+orchestrator, executor, integrator, and remediator. After writers stop, run one independent read-only
 reviewer using the operator-selected model.
+
+If a native reviewer preset inherits the owner model and the operator selected a different reviewer,
+override it. If reliable override is unavailable, use one separate isolated reviewer session.
 
 If no project workflow applies, use this shape at the smallest useful scale. Do not add readiness
 layers, model panels, or extra gates without an explicit request or concrete remaining risk.
@@ -88,11 +95,10 @@ layers, model panels, or extra gates without an explicit request or concrete rem
 
 OpenCode project skills live under `.opencode/skills/`; global skills live under
 `~/.config/opencode/skills/`. OpenCode may also discover compatible `.agents/skills/` and `.claude/skills/`
-locations.
+locations. Globally managed skills remain global; do not create workflow-local copies by default.
 
 Project agents live under `.opencode/agents/`; global agents live under `~/.config/opencode/agents/`.
-Use the smallest applicable skill set and read a relevant skill before acting. For cross-session
-transfer, use the globally managed `handoff` skill when the operator invokes it.
+Use the smallest applicable skill set and read a relevant skill before acting.
 
 ## 13. Engineering Defaults
 

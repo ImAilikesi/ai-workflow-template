@@ -11,7 +11,9 @@ Use one active model as owner, orchestrator, executor, integrator, and remediato
 5. `CHANGES` returns to the same owner/executor for remediation and targeted recheck.
 6. `PASS` returns to the same owner/executor for candidate-freshness verification and final signoff.
 
-The reviewer model is not fixed by this workflow. Do not add readiness reviewers, research panels, extra gates, or cross-model ceremonies unless the operator explicitly asks for them or a concrete risk requires them.
+The reviewer model is not fixed by this workflow. If a native reviewer preset inherits the owner model, override it when the operator selected a different reviewer. If that harness cannot override the reviewer model reliably, use one separate isolated reviewer session with the selected model.
+
+Do not add readiness reviewers, research panels, extra gates, or cross-model ceremonies unless the operator explicitly asks for them or a concrete risk requires them.
 
 ## Review contract
 
