@@ -21,23 +21,19 @@ and OpenCode. This file contains project-specific rules only.
 [One short statement: current phase/workstream, what is working, and the main unresolved item]
 
 # Workflow
-Use only the workflow for the harness running the current session. Several harness templates may
-coexist in one repository; do not combine their mechanics.
+Use the workflow/instructions of the harness that is running the current session. Global harness
+configuration owns orchestration, execution, review, continuation, and signoff. Do not duplicate or
+combine harness workflow mechanics in this project file.
 
-- Codex: `.codex/WORKFLOW.md`.
-- DSH: `.dsh/WORKFLOW.md`.
-- Cursor: `.cursor/WORKFLOW.md`.
-- Pi: `.pi/WORKFLOW.md`.
-- Command Code: `.commandcode/WORKFLOW.md`.
-- OpenCode: `.opencode/WORKFLOW.md`.
+If the operator explicitly selects a non-default workflow, reviewer, topology, or routing override,
+that explicit choice wins for the current work.
 
-The workflow file owns role topology and review mechanics. Globally managed skills remain global;
-do not copy workflow skills into the project template.
-
-[Project-only workflow constraints or routing overrides, if any. Do not restate the harness workflow
-protocol here.]
+[Project-only workflow constraints or routing overrides, if any.]
 
 # Project Skills
+Shared skills are managed globally through Skills Manager. List only project-specific local skills
+that this project intentionally requires.
+
 [List project-only skills or leave empty. Do not repeat global skill-framework guidance.]
 
 # Local Rules

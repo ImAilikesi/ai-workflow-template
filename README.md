@@ -1,6 +1,6 @@
 # AI Workflow Template
 
-A lean public-safe control room for AI coding-harness instructions, workflows, and copy-ready project templates.
+A lean public-safe control room for AI coding-harness instructions, workflows, and shared project instruction templates.
 
 ## Architecture
 
@@ -19,14 +19,9 @@ live/                       # exact intended global live state
 └── dsh/
     └── AGENTS.md
 
-templates/                  # manual copy/paste project bundles
-├── codex/
-├── opencode/
-├── claude/
-├── dsh/
-├── pi/
-├── command-code/
-└── cursor/
+templates/                  # manual project instruction templates
+├── project-AGENTS.md
+└── project-CLAUDE.md
 
 inactive/                   # retained but not live or synced
 └── codex/
@@ -45,15 +40,21 @@ Harnesses still read their normal global paths. There are no symlinks and no run
 
 ### `templates/`
 
-`templates/` contains complete project folders for manual copy/paste. Project installation stays manual by design.
+`templates/` contains shared project instruction files only. It does not contain harness packages or harness-specific workflow installs.
 
-Example:
+For AGENTS.md-compatible harnesses:
 
 ```bash
-cp -R templates/codex/. /path/to/project/
+cp templates/project-AGENTS.md /path/to/project/AGENTS.md
 ```
 
-Then fill the bracketed project fields in `AGENTS.md` or `CLAUDE.md`.
+For Claude:
+
+```bash
+cp templates/project-CLAUDE.md /path/to/project/CLAUDE.md
+```
+
+Then fill the bracketed project fields. The active harness's global instructions/workflow remain authoritative for orchestration and review. Project templates contain project facts, constraints, commands, status, and local overrides only.
 
 ### `inactive/`
 
@@ -132,7 +133,7 @@ Bias toward continuity: reuse the same Sol parent, executor lineage, and reviewe
 
 ## Other harnesses
 
-Cursor, Command Code, Pi, DSH, Claude, and OpenCode project templates use one model-agnostic workflow:
+Non-Codex harness workflows use one model-agnostic shape in their global configuration:
 
 ```text
 primary parent = owner + orchestrator + executor
@@ -140,7 +141,7 @@ primary parent = owner + orchestrator + executor
 → same parent final signoff
 ```
 
-The template does not pin the owner or reviewer model. If the harness cannot run the chosen reviewer model as a native child, use one isolated reviewer session instead.
+The project templates do not pin the owner or reviewer model and do not install a harness workflow. If a harness cannot run the chosen reviewer model as a native child, use one isolated reviewer session instead.
 
 The same configured-role restriction applies: no ad-hoc or unconfigured native subagents unless the operator explicitly overrides it.
 
@@ -149,7 +150,7 @@ The same configured-role restriction applies: no ad-hoc or unconfigured native s
 The repository no longer ships its custom handoff or phase-gate skills as active configuration.
 
 - Cross-session transfer uses the globally managed `handoff` skill where available.
-- Useful phase-gate mechanics — bounded scope, verification, candidate freeze, independent review, targeted recheck, and final signoff — live directly in concise `WORKFLOW.md` files.
+- Useful phase-gate mechanics — bounded scope, verification, candidate freeze, independent review, targeted recheck, and final signoff — live directly in concise global workflow/instruction files.
 - Retired custom phase-gate/handoff assets and the previous detailed MCR implementation are retained under `inactive/codex/` for future reference.
 
 ## Sync

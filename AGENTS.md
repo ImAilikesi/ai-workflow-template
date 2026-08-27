@@ -5,7 +5,7 @@
 This repository is a public-safe control room for editable AI harness instruction and workflow surfaces.
 
 - `live/` mirrors the intended global state for harnesses actually configured on the machine.
-- `templates/` contains manual copy-ready project bundles.
+- `templates/` contains shared manual project instruction templates.
 - `inactive/` retains curated non-live assets for possible future reuse.
 - `sync.sh` mirrors only tracked public-safe live files to normal harness locations.
 
@@ -17,8 +17,11 @@ Skills are managed separately by Skills Manager. Do not add shared skill librari
 - `live/opencode/` — global OpenCode `AGENTS.md`, `WORKFLOW.md`, and hand-maintained agents.
 - `live/claude/` — global Claude instruction file.
 - `live/dsh/` — global DSH instruction file.
-- `templates/<harness>/` — complete manual project bundle for that harness.
+- `templates/project-AGENTS.md` — shared project template for AGENTS.md-compatible harnesses.
+- `templates/project-CLAUDE.md` — Claude project template.
 - `inactive/` — public-safe retained assets that are not live, not synced, and not normative.
+
+Project templates contain project-specific facts and constraints only. Do not turn `templates/` back into harness packages or install global workflow mechanics into projects by default.
 
 Do not add a harness under `live/` until its real local editable instruction surface is verified. Do not add symlinks or make harnesses read this repository at runtime.
 
@@ -38,13 +41,15 @@ Only spawn native subagents/roles that are explicitly configured for the active 
 
 MCR is optional project-level authority for genuinely multi-phase or multi-workstream projects. Keep it in a separate principal thread above phase parent threads; do not mix MCR state with ordinary executor/reviewer context.
 
-Other harness templates use one model-agnostic shape: one primary parent owns orchestration and execution; the operator selects one independent reviewer model.
+Other harness global workflows use one model-agnostic shape: one primary parent owns orchestration and execution; the operator selects one independent reviewer model. Project templates do not install or duplicate that workflow.
 
-Do not restore separate live phase-gate or custom handoff skill packages here. Keep the useful review/verification mechanics in concise `WORKFLOW.md` files. Cross-session transfer uses the globally managed `handoff` skill where available. Retired custom skills may be retained under `inactive/`.
+Do not restore separate live phase-gate or custom handoff skill packages here. Keep the useful review/verification mechanics in concise global workflow/instruction files. Cross-session transfer uses the globally managed `handoff` skill where available. Retired custom skills may be retained under `inactive/`.
 
 ## Content preservation
 
 Global `AGENTS.md` / `CLAUDE.md` behavior is intentionally stable. Preserve existing rules unless a requested workflow or architecture change requires a specific edit. Do not broadly rewrite these files during structural work.
+
+The shared project template structure is also intentionally stable: Provider, Project, Stack, Commands, Architecture, External Dependencies, Current Status, Workflow, Project Skills, Local Rules, and Memory. Keep project templates unfilled and harness-agnostic apart from the Claude-specific file.
 
 ## Public-safe boundary
 

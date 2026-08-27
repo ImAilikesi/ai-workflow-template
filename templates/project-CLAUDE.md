@@ -20,16 +20,19 @@ Claude project instructions. This file contains project-specific rules only.
 [One short statement: current phase/workstream, what is working, and the main unresolved item]
 
 # Workflow
-The workflow lives in `.claude/WORKFLOW.md`. The active Claude model is owner, orchestrator,
-executor, integrator, and remediator; the operator selects the independent reviewer model.
+Claude's global instructions/workflow own orchestration, execution, review, continuation, and signoff.
+Keep this file project-specific and do not duplicate global workflow mechanics here.
 
-Do not duplicate workflow mechanics here.
+If the operator explicitly selects a non-default reviewer, topology, or routing override, that explicit
+choice wins for the current work.
 
 [Project-only workflow constraints or routing overrides, if any.]
 
 # Project Skills
-[List project-specific Claude/Superpowers skills, loops, or playbooks only when this project uses them.
-Keep optional playbooks opt-in and define their stop condition before use.]
+Shared skills are managed globally through Skills Manager. List project-specific Claude/Superpowers
+skills, loops, or playbooks only when this project intentionally uses them.
+
+[Project-only skills or leave empty. Keep optional playbooks opt-in and define their stop condition.]
 
 # Local Rules
 [Project-only conventions, invariants, scope boundaries, acceptance criteria, and protected paths.
