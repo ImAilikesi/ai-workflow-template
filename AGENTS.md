@@ -1,85 +1,59 @@
-# Provider
-Codex instructions for the AI Workflow Template repository itself.
+# Repository Instructions
 
-Note: this repository *ships* workflow templates. It does not *run* any shipped phase workflow on
-itself. Do not install `.codex/`, `.agents/`, `.claude/`, `.dsh/`, `.cursor/`, `.pi/`,
-`.commandcode/`, or `.opencode/` here — those are install destinations in consuming projects, not
-part of this tree.
+## Purpose
 
-# Project
-Source-of-truth templates for a phase-gated AI engineering workflow across Claude, Codex, DSH,
-Cursor, Pi, Command Code, and OpenCode. Content only: instruction files, workflow contracts, skills,
-role presets, execution loops, and harness-specific role prompts.
+This repository is a public-safe control room for editable AI harness instruction and workflow surfaces.
 
-# Stack
-Markdown, YAML, TOML, and JSON Schema. No build, no runtime, no dependencies.
+- `live/` mirrors the intended global state for harnesses actually configured on the machine.
+- `templates/` contains manual copy-ready project bundles.
+- `inactive/` retains curated non-live assets for possible future reuse.
+- `sync.sh` mirrors only tracked public-safe live files to normal harness locations.
 
-# Commands
-No test, build, or lint tooling. Verification is structural — see Local Rules.
+Skills are managed separately by Skills Manager. Do not add shared skill libraries here.
 
-# Architecture
-- `codex-native/` — Codex-orchestrated variant: `WORKFLOW.md`, `skills/`, `roles/*.toml`, `plugin/`.
-- `claude-hybrid/` — Claude-orchestrated variant: `WORKFLOW.md`, `skills/`, `loops/`.
-- `dsh-native/` — DSH-orchestrated variant: `WORKFLOW.md`, namespaced `skills/`.
-- `cursor-native/` — Cursor-orchestrated variant: `WORKFLOW.md`, namespaced `skills/`, `agents/`.
-- `pi-native/` — Pi-orchestrated variant: `WORKFLOW.md`, namespaced `skills/`.
-- `commandcode-native/` — Command Code-orchestrated variant: `WORKFLOW.md`, namespaced `skills/`, `agents/`.
-- `opencode-native/` — OpenCode-orchestrated variant: `WORKFLOW.md`, namespaced `skills/`, `agents/`, `plugins/`.
-- `templates/` — harness-specific global instructions plus shared project `AGENTS.md` and Claude
-  project `CLAUDE.md` templates.
-- `README.md` — the public entry point: what each file is and where it installs.
-- `CONTRIBUTING.md`, `SECURITY.md`, `LICENSE` — public project files (MIT).
+## Locked architecture
 
-# External Dependencies
-Install destinations only: `~/.codex/AGENTS.md`, `~/.codex/agents/`, `~/.claude/CLAUDE.md`,
-`$DSH_HOME/AGENTS.md` (default `~/.dsh/AGENTS.md`), `~/.pi/agent/AGENTS.md`,
-`~/.commandcode/AGENTS.md`, `~/.config/opencode/AGENTS.md`, Cursor User Rules, and the
-harness-specific project directories in consuming repositories. Nothing here reads them back.
+- `live/codex/` — global Codex `AGENTS.md`, `WORKFLOW.md`, and hand-maintained role TOMLs.
+- `live/opencode/` — global OpenCode `AGENTS.md`, `WORKFLOW.md`, and hand-maintained agents.
+- `live/claude/` — global Claude instruction file.
+- `live/dsh/` — global DSH instruction file.
+- `templates/<harness>/` — complete manual project bundle for that harness.
+- `inactive/` — public-safe retained assets that are not live, not synced, and not normative.
 
-# Current Status
-Seven harness packages plus `templates/`. Each harness package is the single source for its native
-workflow surface; there are no installed copies inside this repository.
+Do not add a harness under `live/` until its real local editable instruction surface is verified. Do not add symlinks or make harnesses read this repository at runtime.
 
-# Workflow
-This repository is the source of `codex-native/WORKFLOW.md`, `claude-hybrid/WORKFLOW.md`,
-`dsh-native/WORKFLOW.md`, `cursor-native/WORKFLOW.md`, `pi-native/WORKFLOW.md`,
-`commandcode-native/WORKFLOW.md`, and `opencode-native/WORKFLOW.md`. Those files are content to edit,
-not contracts that govern work in this repository. Ordinary edits here need no phase lifecycle.
+## Workflow rules
 
-Keep harness surfaces independent. A shared lifecycle idea must be expressed in each harness's own
-native terms. Do not copy one harness's topology, tool names, model assumptions, or install paths into
-another.
+Codex has exactly three standard workflow topologies:
 
-# Project Skills
-None. The `skills/` directories are shipped artifacts, not skills active in this repository.
+1. **Native — default:** Sol parent -> Luna executor -> final Terra review -> same Sol final signoff.
+2. **Sol + GLM:** Sol parent -> GLM executor -> isolated GLM reviewer -> same Sol final signoff; Terra only for critical final audit.
+3. **Sol-only:** Sol owner/orchestrator/executor -> final Terra review -> same Sol final signoff.
 
-# Local Rules
-- **No duplicated content within a surface.** A file must not exist twice inside one harness package,
-  and a package file must never have an "installed copy" elsewhere in this repository.
-- **Harness isolation.** No harness package references another harness package's source paths. Shared
-  project facts belong in `templates/project-AGENTS.md`; Claude keeps its separate
-  `templates/project-CLAUDE.md` surface.
-- **Global template naming is intentional.** `templates/global-AGENTS.md` is the Codex global
-  `AGENTS.md` template and keeps that filename. DSH, Pi, Command Code, and OpenCode use separately
-  named global AGENTS templates; Cursor uses a User Rules template.
-- **Namespaced new workflow skills.** DSH, Cursor, Pi, Command Code, and OpenCode workflow skill names
-  include the harness prefix so projects can contain several harness packages without same-name skill
-  collisions. Do not rename the existing Codex skills as part of unrelated work.
-- **Paths inside a package are consumer paths.** A reference to `.dsh/WORKFLOW.md` inside
-  `dsh-native/`, for example, describes where the file lands in a consuming project. Do not rewrite
-  it to match this repository's layout.
-- **Templates stay unfilled.** Placeholders in `templates/` are `[bracketed]` on purpose. Never fill
-  them with example project data.
-- **Verification is structural.** Before claiming a change is complete: no dangling relative links,
-  no orphaned files, no duplicate workflow skill identities across co-installable new packages, and
-  `README.md` install tables match the real tree.
-- Write instruction content in ASD-STE100 Simplified Technical English.
+A substantial Codex task uses one persistent Sol parent thread. Delegated executors, bounded helpers, and reviewers sit below that parent; do not create a peer Sol orchestrator beside its executor.
 
-# Memory
-No `memory/` directory. `.archive/` holds historical evidence, is gitignored, and is not a source of
-truth — do not treat it as current.
+`luna_research_worker` and `volume_worker` are the shared bounded helper roles. Both are optional, never mandatory, and recommended only when they materially reduce serial work, add useful evidence, or isolate a genuinely disjoint slice. Other configured Codex roles remain available unless the operator explicitly authorizes deletion, but they are not mandatory workflow stages.
 
-# Version Control
+Only spawn native subagents/roles that are explicitly configured for the active harness with verifiable model/provider/permission boundaries. Do not invent ad-hoc roles, silently substitute another model/provider, or spawn an unconfigured generic child unless the operator explicitly overrides this rule.
 
-- Do not commit or push unless explicitly authorized.
-- Never touch `.env`, secrets, credentials, or private data; check `.gitignore` before creating files.
+MCR is optional project-level authority for genuinely multi-phase or multi-workstream projects. Keep it in a separate principal thread above phase parent threads; do not mix MCR state with ordinary executor/reviewer context.
+
+Other harness templates use one model-agnostic shape: one primary parent owns orchestration and execution; the operator selects one independent reviewer model.
+
+Do not restore separate live phase-gate or custom handoff skill packages here. Keep the useful review/verification mechanics in concise `WORKFLOW.md` files. Cross-session transfer uses the globally managed `handoff` skill where available. Retired custom skills may be retained under `inactive/`.
+
+## Content preservation
+
+Global `AGENTS.md` / `CLAUDE.md` behavior is intentionally stable. Preserve existing rules unless a requested workflow or architecture change requires a specific edit. Do not broadly rewrite these files during structural work.
+
+## Public-safe boundary
+
+Never commit API keys, tokens, provider credentials, `.env`, private project data, memories, caches, account state, full provider configuration, or generated authenticated router files.
+
+Generated Codex Router model-role files are not source-controlled here. Hand-maintained role TOMLs are.
+
+## Changes
+
+Read the current tree and README before structural edits. Keep moves mechanical where possible. Verify `sync.sh` syntax and mappings when live surfaces change.
+
+Do not commit or push unless explicitly authorized.
