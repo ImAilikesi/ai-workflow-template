@@ -99,12 +99,18 @@ Use for the hardest or most consequential work where Sol should implement direct
 
 ### Shared bounded helpers
 
-Only two helpers are normal shared workflow tools:
+Two helpers are shared across the Codex workflows:
 
 - `luna_research_worker` — bounded read-only research/question lane;
 - `volume_worker` — bounded disjoint implementation slice.
 
+Both are **optional, never mandatory**. They are recommended only when they materially reduce serial work, add useful evidence, or isolate a genuinely disjoint slice. A workflow must remain valid without them.
+
 Other configured Codex roles remain installed, but they are not mandatory stages in the three standard workflows.
+
+### Subagent safety
+
+Native subagents must map to roles that are explicitly configured for the active harness with verifiable model/provider/permission boundaries. Do not invent ad-hoc roles, guess role names, silently substitute models/providers, or spawn an unconfigured generic child unless the operator explicitly overrides this restriction.
 
 ## Codex thread model
 
@@ -135,6 +141,8 @@ primary parent = owner + orchestrator + executor
 ```
 
 The template does not pin the owner or reviewer model. If the harness cannot run the chosen reviewer model as a native child, use one isolated reviewer session instead.
+
+The same configured-role restriction applies: no ad-hoc or unconfigured native subagents unless the operator explicitly overrides it.
 
 ## Handoff and phase gating
 

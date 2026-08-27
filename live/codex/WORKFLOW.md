@@ -20,6 +20,8 @@ The primary executor remains one lineage through implementation and remediation.
 
 When nested child creation is supported, research and volume workers belong under the active delegated executor. If nested creation is not supported, the Sol parent may spawn them on the executor's behalf using the executor's bounded contract; they still report to the executor and gain no authority.
 
+Only spawn roles that are explicitly configured in the active Codex agent registry (`~/.codex/agents/` or an approved project equivalent) and whose intended model/provider/sandbox can be verified. Do not invent ad-hoc subagent roles, guess role names, silently substitute another model/provider, or use an unconfigured generic child unless the operator explicitly overrides this rule.
+
 Do not create extra visible principal threads when native child routing works. If native child creation itself is unavailable, use one visible fallback session for that logical role and preserve the same hierarchy. Never keep both native and fallback copies of one role.
 
 ## 1. Native — default Sol + Luna
@@ -64,12 +66,12 @@ Use when Sol should directly own implementation because the task is unusually di
 
 ## Shared supporting subagents
 
-Only two supporting roles are part of the normal shared toolbox:
+The shared helpers are **optional, never mandatory**. They are recommended only when they materially reduce serial work, add useful evidence, or isolate a genuinely disjoint slice.
 
 - `luna_research_worker` — one bounded read-only question. Run several only when the questions are genuinely independent. Return evidence to the active executor and stop.
 - `volume_worker` — one bounded, disjoint implementation slice with explicit file/task ownership. It never owns shared contracts, architecture, integration, review, or final judgment.
 
-Keep worker scope small enough that the primary executor can integrate and verify the result without reconstructing the worker's reasoning.
+Keep worker scope small enough that the primary executor can integrate and verify the result without reconstructing the worker's reasoning. A workflow must remain valid when no shared helper is spawned.
 
 `pre_terra_readiness_reviewer` and `sol_advisor` remain installed and available because they are configured roles, but they are not part of the three standard workflows. Use them only on explicit operator direction or a concrete exceptional need.
 

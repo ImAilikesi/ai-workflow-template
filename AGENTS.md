@@ -32,7 +32,9 @@ Codex has exactly three standard workflow topologies:
 
 A substantial Codex task uses one persistent Sol parent thread. Delegated executors, bounded helpers, and reviewers sit below that parent; do not create a peer Sol orchestrator beside its executor.
 
-`luna_research_worker` and `volume_worker` are the normal shared bounded helper roles. Other configured Codex roles remain available unless the operator explicitly authorizes deletion, but they are not mandatory workflow stages.
+`luna_research_worker` and `volume_worker` are the shared bounded helper roles. Both are optional, never mandatory, and recommended only when they materially reduce serial work, add useful evidence, or isolate a genuinely disjoint slice. Other configured Codex roles remain available unless the operator explicitly authorizes deletion, but they are not mandatory workflow stages.
+
+Only spawn native subagents/roles that are explicitly configured for the active harness with verifiable model/provider/permission boundaries. Do not invent ad-hoc roles, silently substitute another model/provider, or spawn an unconfigured generic child unless the operator explicitly overrides this rule.
 
 MCR is optional project-level authority for genuinely multi-phase or multi-workstream projects. Keep it in a separate principal thread above phase parent threads; do not mix MCR state with ordinary executor/reviewer context.
 

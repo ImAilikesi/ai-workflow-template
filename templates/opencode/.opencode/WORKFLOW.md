@@ -13,6 +13,8 @@ primary parent — owner/orchestrator/executor
 
 Do not create a second orchestrator, readiness lane, review panel, or extra principal thread. If the harness can run the operator-selected reviewer as a native child, use that. If it cannot override the reviewer model reliably, use one separate isolated reviewer session with the selected model.
 
+Only spawn a subagent or named role when it is explicitly configured/registered for the active harness and its intended model, permissions, and role boundary can be verified. Do not invent ad-hoc roles, silently substitute a different model/provider, or use an unconfigured generic child unless the operator explicitly overrides this rule.
+
 ## Flow
 
 1. Re-ground from project instructions, the accepted task/phase contract, and the live tree.
