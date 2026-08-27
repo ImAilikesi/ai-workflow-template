@@ -1,81 +1,91 @@
 # AI Workflow Template
 
-Lean control room for public-safe AI harness instructions.
+A lean public-safe control room for AI coding-harness instructions and copy-ready project workflow templates.
 
-## What lives here
+## Structure
 
 ```text
 live/
-  codex/
-    AGENTS.md
-    WORKFLOW.md
-    agents/
-      glm_executor.toml
-      glm_reviewer.toml
-      critical_reviewer.toml
-
-  opencode/
-    AGENTS.md
-    WORKFLOW.md
-    agents/
-      worker.md
-      reviewer.md
-
-  claude/
-    CLAUDE.md
-
-  dsh/
-    AGENTS.md
+├── codex/
+│   ├── AGENTS.md
+│   ├── WORKFLOW.md
+│   └── agents/
+├── opencode/
+│   ├── AGENTS.md
+│   ├── WORKFLOW.md
+│   └── agents/
+├── claude/
+│   └── CLAUDE.md
+└── dsh/
+    └── AGENTS.md
 
 templates/
-  project/
-    AGENTS.md
-    CLAUDE.md
-
-sync.sh
+├── codex/
+├── opencode/
+├── claude/
+├── dsh/
+├── pi/
+├── command-code/
+└── cursor/
 ```
 
-`live/` is curated desired global state, not a dump of harness directories. It excludes skills, memories, caches, plans, provider/account configuration, secrets, and generated Codex Router model files.
+`live/` is the intended global editable state for harnesses actually configured on the current machine. `sync.sh` mirrors those files to their normal harness locations. It does not use symlinks and it does not make any harness read this repository at runtime.
 
-Harnesses continue to read their normal global paths. Nothing reads configuration from this repository at runtime and no symlinks are used.
+`templates/` contains complete project folders for manual copy/paste. Project templates are manual by design.
 
-## Workflow
+Skills are managed separately by Skills Manager. Credentials, provider/account configuration, generated router files, memories, caches, and private data do not belong here.
 
-The main Codex workflow is intentionally small:
+## Codex workflows
 
-```text
-same Sol owner
-  -> GLM-5.3-Flash executor
-  -> isolated GLM-5.3-Flash reviewer
-  -> same Sol owner final verification/signoff
-```
+`live/codex/WORKFLOW.md` defines exactly three standard topologies:
 
-For critical money, security, release, consequential data integrity, trading truth, major architecture, or explicit critical-review work, an optional Terra/max review runs after GLM review and before the same Sol owner signs off.
+1. **Sol + GLM — default:** same Sol owner -> GLM executor -> isolated GLM reviewer -> same Sol final verification. Terra is added only for critical final audit.
+2. **Sol-only — hardest work:** same Sol owner/orchestrator/executor -> one final Terra review -> same Sol signoff.
+3. **Sol + Luna — conservative native path:** same Sol owner -> Luna executor -> one final Terra review -> same Sol signoff.
 
-OpenCode stays simpler: one primary agent by default, optional bounded workers, and one isolated reviewer for substantial work. It has no phase-gate lifecycle.
+Existing Codex supporting roles remain available but are optional, not mandatory workflow stages.
+
+## Other harnesses
+
+Cursor, Command Code, Pi, DSH, Claude, and OpenCode project templates use one model-agnostic workflow:
+
+`active model = owner + orchestrator + executor -> operator-selected independent reviewer -> same owner final signoff`
+
+The operator chooses both models. The template does not pin a provider or reviewer model.
+
+## Handoff and phase gating
+
+The repository no longer ships its own handoff or phase-gate skills.
+
+- Cross-session handoff uses the globally managed `handoff` skill.
+- The useful phase-gate ideas — bounded scope, verification, candidate freeze, independent review, targeted recheck, and final signoff — live directly in the concise `WORKFLOW.md` files.
 
 ## Sync
 
-```sh
+```bash
 ./sync.sh status
 ./sync.sh apply
 ./sync.sh pull
 ```
 
-- `status` compares tracked repo files with their native global locations.
-- `apply` copies repo state to the harness directories.
-- `pull` copies the current installed versions of tracked files back into the repo checkout.
+- `status` reports missing or drifting live files.
+- `apply` copies repository live state into normal global harness locations.
+- `pull` copies current global harness files back into `live/`.
 
-`sync.sh` only touches files already tracked under the supported live roots. It does not discover or import other files.
+Review changes before `apply`. The script only handles tracked public-safe surfaces under `live/`.
 
 ## Project templates
 
-Project instructions are manual by design. Copy the appropriate starter from `templates/project/` into a repository and fill the bracketed project facts. Do not embed global workflow protocol in project files.
+Copy one harness folder into a project root, preserving hidden directories. Example:
 
-## Safety
+```bash
+cp -R templates/codex/. /path/to/project/
+```
 
-Never commit API keys, tokens, provider/account configuration, private project data, `.env`, or machine-specific secrets.
+Then fill the bracketed project fields in `AGENTS.md` or `CLAUDE.md`.
 
-## License
+## Public-safe boundary
 
-MIT.
+Do not commit API keys, tokens, `.env`, private project data, full provider configuration, account state, generated authenticated router files, memories, caches, or machine-specific secrets.
+
+MIT licensed.
